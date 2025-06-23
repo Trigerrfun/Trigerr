@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Circle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Import Inter font for a modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Ensure the body fills the entire viewport and hides scrollbars */
+            overflow: hidden; /* Prevent scrolling, especially horizontal */
+            overscroll-behavior: contain; /* Prevent pull-to-refresh on touch devices */
+            touch-action: none; /* Disable default touch actions like pan, zoom on the body */
+        }
+
+        /* Custom glow for main title and score text */
+        .animate-text-glow {
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 15px rgba(255, 255, 255, 0.4);
+            animation: pulse-glow 3s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 15px rgba(255, 255, 255, 0.4); }
+            50% { text-shadow: 0 0 12px rgba(255, 255, 255, 0.8), 0 0 25px rgba(255, 255, 255, 0.6); }
+            100% { text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 15px rgba(255, 255, 255, 0.4); }
+        }
+
+        /* Animations for the central score display */
+        .score-display.show {
+            animation: score-pop-in 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+
+        .score-display.hide {
+            animation: score-fade-out 0.3s ease-out forwards;
+        }
+
+        @keyframes score-pop-in {
+            0% { opacity: 0; transform: scale(0.5) translateY(50px); }
+            70% { opacity: 1; transform: scale(1.1) translateY(-10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes score-fade-out {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.5); }
+        }
+
+        /* Optional: for a subtle pulse on buttons on hover/focus */
+        .game-button:hover, .game-button:focus-visible {
+            box-shadow: 0 0 20px rgba(147, 197, 253, 0.7); /* blue-300 with transparency */
+            outline: none; /* Remove default focus outline if using custom focus styles */
+        }
+
+        /* Animation for the sound icon */
+        .pulse-animation {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-black text-gray-100 min-h-screen flex flex-col items-center justify-center font-inter p-0 m-0 select-none">
+
+    <canvas id="backgroundCanvas" class="fixed top-0 left-0 w-full h-full z-0"></canvas>
+
+    <div class="fixed top-0 left-0 w-full h-full flex flex-col justify-between items-center p-4 md:p-8 z-10 pointer-events-none">
+
+        <div class="w-full flex flex-col items-center pointer-events-auto">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-400 to-blue-500 mb-2 text-center animate-text-glow"
+                aria-label="Perfect Circle Game">
+                Perfect Circle
+            </h1>
+            <p id="messageDisplay" class="text-center text-md md:text-lg mt-2 min-h-[1.5rem] font-bold" aria-live="polite">Ready to draw a perfect circle?</p>
+        </div>
+
+        <div id="accuracyMeterWrapper" class="absolute inset-0 flex items-center justify-center pointer-events-none hidden">
+            <span id="accuracyMeterValue" class="text-5xl md:text-7xl font-extrabold transition-colors duration-300">0%</span>
+        </div>
+
+        <div id="centralScoreDisplayWrapper" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none hidden">
+            <span id="centralScoreText" class="score-display text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-400 to-purple-400 text-6xl md:text-8xl font-extrabold opacity-0 transform scale-50">0%</span>
+            <p id="scoreMessage" class="mt-2 text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400 hidden"></p>
+            <p id="highScoreDisplay" class="mt-4 text-lg md:text-xl font-semibold text-gray-400 hidden">High Score: 0%</p>
+        </div>
+
+        <div id="initialStartContainer" class="absolute inset-0 flex items-center justify-center pointer-events-auto z-20">
+            <button id="startButton"
+                    class="game-button px-8 py-3 rounded-full text-lg font-bold shadow-lg transform transition duration-300 ease-in-out hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                    aria-label="Start New Game">
+                Start
+            </button>
+        </div>
+
+
+        <div id="postGameControls" class="w-full flex flex-col md:flex-row items-center justify-center gap-4 pointer-events-auto mb-4 hidden">
+            <button id="shareButton"
+                    class="game-button px-8 py-3 rounded-full text-lg font-bold shadow-lg transform transition duration-300 ease-in-out hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-75 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white"
+                    aria-label="Share Game">
+                Share
+            </button>
+
+            <div id="audioToggleButton" class="pointer-events-auto">
+                <button class="audio-toggle-button audio-on w-12 h-12 flex items-center justify-center rounded-full text-xl">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="drawingCanvas"
+            class="block cursor-crosshair fixed top-0 left-0 w-full h-full z-5"
+            aria-label="Interactive drawing area. Draw a perfect circle."
+            tabindex="0"
+            touch-action="none"> </canvas>
+
+    <div id="customMessageBox" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+        <div id="messageBoxInner" class="bg-gray-800 rounded-xl p-8 shadow-2xl border border-purple-700 max-w-sm w-11/12 text-center transform scale-0 opacity-0 transition-all duration-300 ease-out">
+            <h3 id="messageBoxTitle" class="text-2xl font-bold text-purple-400 mb-4"></h3>
+            <p id="messageBoxContent" class="text-gray-200 mb-6"></p>
+            <button id="messageBoxClose"
+                    class="game-button px-6 py-3 rounded-full text-lg font-bold shadow-lg transform transition duration-300 ease-in-out hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-pink-700 text-white"
+                    aria-label="Close message">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

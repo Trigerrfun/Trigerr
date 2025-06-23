@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Rock Paper Scissors</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/png" href="rock-paper-scissors.png" id="favicon-link">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="welcome-screen" class="screen-container">
+        <h2>Rock Paper Scissors!</h2>
+        <p>What's your name, Challenger?</p>
+        <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="15">
+
+        <div id="series-selection">
+            <label for="series-length-select">Play Best of:</label>
+            <select id="series-length-select">
+                <option value="1">1 Round (Single)</option>
+                <option value="3" selected>3 Rounds</option>
+                <option value="5">5 Rounds</option>
+                <option value="7">7 Rounds</option>
+            </select>
+        </div>
+
+        <button id="start-game-btn">Start Game</button>
+    </div>
+
+    <div id="game-container" class="screen-container">
+        <div class="game-controls">
+            <button id="sound-toggle-btn" class="control-btn">&#128266;</button>
+            <button id="share-btn" class="control-btn">&#128271;</button>
+        </div>
+
+        <div class="player-vs-computer">
+            <span id="player-name-display-game">Player</span>
+            <span>v/s</span>
+            <span id="computer-label">Computer</span>
+        </div>
+
+        <div class="series-score">
+            <span id="player-series-wins">0</span> - <span id="computer-series-wins">0</span> (Best of <span id="current-series-length">3</span>)
+        </div>
+
+        <div class="game-area">
+            <div id="player-hand" class="hand hidden">
+                <img id="player-hand-img" src="Rock.png" alt="Player Hand">
+            </div>
+            <div id="computer-hand" class="hand hidden">
+                <img id="computer-hand-img" src="Rock.png" alt="Computer Hand">
+            </div>
+            <div id="impact-effect" class="impact-effect"></div>
+        </div>
+
+        <div class="choices" id="choices-container">
+            <button id="rock" class="choice-btn">
+                <img src="Rock.png" alt="Rock Hand" class="choice-img">
+                <span>Rock</span>
+            </button>
+            <button id="paper" class="choice-btn">
+                <img src="Paper.png" alt="Paper Hand" class="choice-img">
+                <span>Paper</span>
+            </button>
+            <button id="scissors" class="choice-btn">
+                <img src="Scissors.png" alt="Scissors Hand" class="choice-img">
+                <span>Scissors</span>
+            </button>
+        </div>
+
+        <div class="result-display">
+            <p id="game-message" class="result-message">Select your Weapon</p>
+            <button id="play-again-btn" class="play-again-btn">Play Again</button>
+        </div>
+
+        <div class="score-board-bottom">
+            <div class="score-item won">
+                <p>Won</p>
+                <span id="player-score">0</span>
+            </div>
+            <div class="score-item lost">
+                <p>Lost</p>
+                <span id="computer-score">0</span>
+            </div>
+            <div class="score-item draw">
+                <p>Draw</p>
+                <span id="tie-score">0</span>
+            </div>
+        </div>
+
+        <audio id="click-sound" src="click.mp3" preload="auto"></audio>
+        <audio id="win-sound" src="win.mp3" preload="auto"></audio>
+        <audio id="error-sound" src="error.mp3" preload="auto"></audio>
+        <audio id="countdown-sound" src="countdown.mp3" preload="auto"></audio>
+        <audio id="impact-sound" src="impact.mp3" preload="auto"></audio>
+        <audio id="game-over-sound" src="gameover.mp3" preload="auto"></audio>
+
+
+        <div id="confetti-container"></div>
+        <div id="game-over-overlay">
+            <p id="overlay-message"></p>
+            <div class="overlay-buttons">
+                <button id="replay-series-btn" class="replay-series-btn">Play Again</button>
+                <button id="main-menu-btn" class="main-menu-btn">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
