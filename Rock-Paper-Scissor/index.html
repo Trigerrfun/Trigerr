@@ -2,115 +2,681 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rock Paper Scissors</title>
-
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="rock-paper-scissors.png" type="image/x-icon" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Define custom fonts and animations using Tailwind's plugin system */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+        }
 
-    <link rel="icon" type="image/png" href="rock-paper-scissors.png" id="favicon-link">
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
 
-    <link rel="stylesheet" href="styles.css">
+        /* --- THEME CUSTOMIZATION START --- */
+        /* Default/Cyan Theme */
+        :root {
+            --player-neon-color: #00aaff; /* Cyan primary */
+            --player-neon-color-light: #00e0ff; /* Lighter cyan for subtle accents */
+        }
+
+        /* Purple Theme */
+        body.theme-purple {
+            --player-neon-color: #aa00ff; /* Purple primary */
+            --player-neon-color-light: #e000ff; /* Lighter purple */
+        }
+
+        /* Green Theme */
+        body.theme-green {
+            --player-neon-color: #00ffaa; /* Green primary */
+            --player-neon-color-light: #00ffc0; /* Lighter green */
+        }
+
+        /* Apply theme colors to relevant elements */
+        .neon-button {
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 0 5px var(--player-neon-color), 0 0 10px var(--player-neon-color), 0 0 15px var(--player-neon-color);
+        }
+        .neon-button:hover {
+            box-shadow: 0 0 10px var(--player-neon-color), 0 0 20px var(--player-neon-color), 0 0 30px var(--player-neon-color), 0 0 40px var(--player-neon-color);
+        }
+
+        .neon-text-player { /* New class for player's dynamic neon text */
+            text-shadow: 0 0 5px rgba(var(--player-neon-color-light-rgb), 0.7), 0 0 10px rgba(var(--player-neon-color-light-rgb), 0.7);
+        }
+        
+        /* Convert hex to rgb for rgba usage in text-shadow */
+        .theme-cyan { --player-neon-color-light-rgb: 0, 224, 255; }
+        .theme-purple { --player-neon-color-light-rgb: 224, 0, 255; }
+        .theme-green { --player-neon-color-light-rgb: 0, 255, 192; }
+
+        /* Update border colors to use variables */
+        .border-player-color-50\/50 { border-color: rgba(var(--player-neon-color-light-rgb), 0.5); }
+        .border-player-color { border-color: var(--player-neon-color); }
+
+        /* Update specific button background to use variables */
+        .bg-player-button { background-color: var(--player-neon-color); }
+        /* --- THEME CUSTOMIZATION END --- */
+
+
+        /* Static Neon glow for text (Computer, Tie, Yellow, Pink) */
+        .neon-text-pink {
+            text-shadow: 0 0 5px rgba(255, 0, 170, 0.7), 0 0 10px rgba(255, 0, 170, 0.7);
+        }
+        .neon-text-green { /* This specific green is for the series WIN message, not player theme */
+            text-shadow: 0 0 5px rgba(0, 255, 170, 0.7), 0 0 10px rgba(0, 255, 170, 0.7);
+        }
+        .neon-text-yellow {
+             text-shadow: 0 0 5px rgba(255, 255, 0, 0.7), 0 0 10px rgba(255, 255, 0, 0.7);
+        }
+
+        /* Keyframe animations */
+        @keyframes hand-shake-player {
+            0%, 100% { transform: rotate(10deg); }
+            50% { transform: translateY(-20px) rotate(-10deg); }
+        }
+        @keyframes hand-shake-computer {
+            0%, 100% { transform: scaleX(-1) rotate(10deg); } 
+            50% { transform: scaleX(-1) translateY(-20px) rotate(-10deg); } 
+        }
+        @keyframes hand-reveal {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes hand-reveal-computer {
+            from { opacity: 0; transform: scaleX(-1) scale(0.5); }
+            to { opacity: 1; transform: scaleX(-1) scale(1); }
+        }
+        @keyframes impact-burst {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10vh) rotateZ(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotateZ(720deg); opacity: 0; }
+        }
+
+        /* Assign animations to utility classes */
+        .animate-hand-shake-player { animation: hand-shake-player 0.5s infinite alternate ease-in-out; }
+        .animate-hand-shake-computer { animation: hand-shake-computer 0.5s infinite alternate ease-in-out; }
+        .animate-hand-reveal { animation: hand-reveal 0.3s ease-out forwards; }
+        .animate-hand-reveal-computer { animation: hand-reveal-computer 0.3s ease-out forwards; }
+        .animate-impact-burst { animation: impact-burst 0.4s ease-out forwards; }
+        .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+        .confetti { animation: confetti-fall 3s linear forwards; }
+    </style>
 </head>
-<body>
-    <div id="welcome-screen" class="screen-container">
-        <h2>Rock Paper Scissors!</h2>
-        <p>What's your name, Challenger?</p>
-        <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="15">
+<body class="bg-[#1a1a2e] flex items-center justify-center min-h-screen p-4">
 
-        <div id="series-selection">
-            <label for="series-length-select">Play Best of:</label>
-            <select id="series-length-select">
-                <option value="1">1 Round (Single)</option>
-                <option value="3" selected>3 Rounds</option>
-                <option value="5">5 Rounds</option>
-                <option value="7">7 Rounds</option>
-            </select>
-        </div>
+    <div id="container" class="w-full max-w-2xl mx-auto">
 
-        <button id="start-game-btn">Start Game</button>
-    </div>
+        <div id="welcome-screen" class="w-full bg-[#162447]/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl border border-player-color-50/50 shadow-2xl animate-fade-in">
+            <h2 class="text-3xl md:text-4xl font-orbitron text-center mb-2 neon-text-player"></h2>
+            <p class="text-center text-white/80 mb-6"></p>
+            
+            <div class="space-y-4">
+                <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="15" class="w-full bg-transparent border-2 border-player-color-50/50 rounded-lg p-3 text-center text-lg text-white focus:border-player-color focus:ring-0 focus:outline-none transition">
+                
+                <div class="flex items-center justify-center gap-4">
+                    <label for="series-length-select" class="text-lg">Best of:</label>
+                    <select id="series-length-select" class="bg-transparent border-2 border-player-color-50/50 rounded-lg p-3 text-lg text-white focus:border-player-color focus:ring-0 focus:outline-none transition">
+                        <option value="1" class="bg-[#1a1a2e]">1</option>
+                        <option value="3" selected class="bg-[#1a1a2e]">3</option>
+                        <option value="5" class="bg-[#1a1a2e]">5</option>
+                        <option value="7" class="bg-[#1a1a2e]">7</option>
+                    </select>
+                </div>
 
-    <div id="game-container" class="screen-container">
-        <div class="game-controls">
-            <button id="sound-toggle-btn" class="control-btn">&#128266;</button>
-            <button id="share-btn" class="control-btn">&#128271;</button>
-        </div>
-
-        <div class="player-vs-computer">
-            <span id="player-name-display-game">Player</span>
-            <span>v/s</span>
-            <span id="computer-label">Computer</span>
-        </div>
-
-        <div class="series-score">
-            <span id="player-series-wins">0</span> - <span id="computer-series-wins">0</span> (Best of <span id="current-series-length">3</span>)
-        </div>
-
-        <div class="game-area">
-            <div id="player-hand" class="hand hidden">
-                <img id="player-hand-img" src="Rock.png" alt="Player Hand">
-            </div>
-            <div id="computer-hand" class="hand hidden">
-                <img id="computer-hand-img" src="Rock.png" alt="Computer Hand">
-            </div>
-            <div id="impact-effect" class="impact-effect"></div>
-        </div>
-
-        <div class="choices" id="choices-container">
-            <button id="rock" class="choice-btn">
-                <img src="Rock.png" alt="Rock Hand" class="choice-img">
-                <span>Rock</span>
-            </button>
-            <button id="paper" class="choice-btn">
-                <img src="Paper.png" alt="Paper Hand" class="choice-img">
-                <span>Paper</span>
-            </button>
-            <button id="scissors" class="choice-btn">
-                <img src="Scissors.png" alt="Scissors Hand" class="choice-img">
-                <span>Scissors</span>
-            </button>
-        </div>
-
-        <div class="result-display">
-            <p id="game-message" class="result-message">Select your Weapon</p>
-            <button id="play-again-btn" class="play-again-btn">Play Again</button>
-        </div>
-
-        <div class="score-board-bottom">
-            <div class="score-item won">
-                <p>Won</p>
-                <span id="player-score">0</span>
-            </div>
-            <div class="score-item lost">
-                <p>Lost</p>
-                <span id="computer-score">0</span>
-            </div>
-            <div class="score-item draw">
-                <p>Draw</p>
-                <span id="tie-score">0</span>
+                <div class="text-center mt-6">
+                    <p class="text-lg mb-2">Choose Your Fun</p>
+                    <div id="theme-selection" class="flex justify-center gap-4">
+                        <button class="theme-swatch w-8 h-8 rounded-full border-2 border-white/50 cursor-pointer transition hover:scale-110" data-theme="cyan" style="background-color: #00aaff;"></button>
+                        <button class="theme-swatch w-8 h-8 rounded-full border-2 border-white/50 cursor-pointer transition hover:scale-110" data-theme="purple" style="background-color: #aa00ff;"></button>
+                        <button class="theme-swatch w-8 h-8 rounded-full border-2 border-white/50 cursor-pointer transition hover:scale-110" data-theme="green" style="background-color: #00ffaa;"></button>
+                    </div>
+                </div>
+                <button id="start-game-btn" class="w-full bg-player-button text-black font-bold text-xl p-3 rounded-lg neon-button transform hover:scale-105 mt-4">
+                    Start Game
+                </button>
+                <button id="how-to-play-btn" class="w-full bg-transparent text-white border-2 border-white/30 hover:border-white/70 font-bold text-lg p-2 rounded-lg transition">
+                    How to Play
+                </button>
             </div>
         </div>
 
-        <audio id="click-sound" src="click.mp3" preload="auto"></audio>
-        <audio id="win-sound" src="win.mp3" preload="auto"></audio>
-        <audio id="error-sound" src="error.mp3" preload="auto"></audio>
-        <audio id="countdown-sound" src="countdown.mp3" preload="auto"></audio>
-        <audio id="impact-sound" src="impact.mp3" preload="auto"></audio>
-        <audio id="game-over-sound" src="gameover.mp3" preload="auto"></audio>
+        <div id="game-screen" class="hidden w-full relative">
+            <div class="absolute top-2 right-2 z-20">
+                <button id="sound-toggle-btn" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-xl hover:bg-white/20 transition-colors">🔊</button>
+            </div>
+            
+            <div class="text-center mb-4">
+                <div class="text-xl md:text-2xl font-bold flex justify-center items-center gap-4">
+                    <span id="player-name-display" class="text-player-color neon-text-player">Player</span>
+                    <span class="text-sm">vs</span>
+                    <span class="text-pink-400 neon-text-pink">Computer</span>
+                </div>
+                <div class="font-orbitron text-lg text-yellow-300 neon-text-yellow">
+                    <span id="player-series-wins">0</span> - <span id="computer-series-wins">0</span>
+                    <span class="text-xs text-white/70">(Best of <span id="current-series-length">3</span>)</span>
+                </div>
+            </div>
 
+            <div class="relative flex items-center justify-around min-h-[150px] md:min-h-[200px] my-4">
+                <div id="impact-effect" class="absolute w-24 h-24 bg-yellow-300 rounded-full opacity-0 pointer-events-none"></div>
+                <div id="player-hand" class="w-28 h-28 md:w-40 md:h-40 opacity-0"></div>
+                <div id="computer-hand" class="w-28 h-28 md:w-40 md:h-40 opacity-0"></div>
+            </div>
 
-        <div id="confetti-container"></div>
-        <div id="game-over-overlay">
-            <p id="overlay-message"></p>
-            <div class="overlay-buttons">
-                <button id="replay-series-btn" class="replay-series-btn">Play Again</button>
-                <button id="main-menu-btn" class="main-menu-btn">Main Menu</button>
+            <div class="text-center min-h-[80px] flex items-center justify-center">
+                <p id="game-message" class="text-xl md:text-3xl font-orbitron font-bold transition-all duration-300">Choose your weapon!</p>
+            </div>
+
+            <div id="choices-container" class="grid grid-cols-3 gap-2 md:gap-4 my-4">
+                <button id="rock" class="choice-btn group bg-transparent border-2 border-player-color-50/50 rounded-lg p-2 md:p-4 transform hover:-translate-y-2 transition-transform duration-300">
+                     <img src="Rock.png" alt="Rock" class="w-16 h-16 md:w-24 md:h-24 object-contain mx-auto">
+                    <span class="font-orbitron mt-2 text-player-color-light group-hover:text-white">ROCK</span>
+                </button>
+                <button id="paper" class="choice-btn group bg-transparent border-2 border-player-color-50/50 rounded-lg p-2 md:p-4 transform hover:-translate-y-2 transition-transform duration-300">
+                    <img src="Paper.png" alt="Paper" class="w-16 h-16 md:w-24 md:h-24 object-contain mx-auto">
+                    <span class="font-orbitron mt-2 text-player-color-light group-hover:text-white">PAPER</span>
+                </button>
+                <button id="scissors" class="choice-btn group bg-transparent border-2 border-player-color-50/50 rounded-lg p-2 md:p-4 transform hover:-translate-y-2 transition-transform duration-300">
+                     <img src="Scissors.png" alt="Scissors" class="w-16 h-16 md:w-24 md:h-24 object-contain mx-auto">
+                    <span class="font-orbitron mt-2 text-player-color-light group-hover:text-white">SCISSORS</span>
+                </button>
+            </div>
+
+            <div class="mt-6 grid grid-cols-3 gap-2 md:gap-4 text-center border-t-2 border-white/10 pt-4">
+                <div>
+                    <p class="font-orbitron text-player-color">WON</p>
+                    <span id="player-score" class="text-3xl font-bold">0</span>
+                </div>
+                <div>
+                    <p class="font-orbitron text-yellow-400">TIE</p>
+                    <span id="tie-score" class="text-3xl font-bold">0</span>
+                </div>
+                <div>
+                    <p class="font-orbitron text-pink-400">LOST</p>
+                    <span id="computer-score" class="text-3xl font-bold">0</span>
+                </div>
+            </div>
+
+            <div id="game-over-overlay" class="hidden absolute inset-0 bg-black/80 z-30 flex-col items-center justify-center gap-4 animate-fade-in">
+                 <div id="confetti-container" class="absolute inset-0 pointer-events-none"></div>
+                <p id="overlay-message" class="text-4xl md:text-5xl font-orbitron font-bold"></p>
+                <div class="flex gap-4 mt-4 flex-wrap justify-center">
+                    <button id="replay-series-btn" class="bg-player-button text-black font-bold text-lg p-3 rounded-lg neon-button">Play Again</button>
+                    <button id="main-menu-btn" class="bg-pink-500 text-black font-bold text-lg p-3 rounded-lg">Main Menu</button>
+                    <button id="share-btn" class="bg-green-500 text-black font-bold text-lg p-3 rounded-lg">Share Result</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="how-to-play-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-[#162447]/90 border border-player-color-50/50 rounded-2xl shadow-2xl p-6 md:p-8 max-w-md w-full relative">
+                <h3 class="text-3xl font-orbitron text-center mb-4 neon-text-player">How to Play</h3>
+                <p class="text-lg mb-4">Welcome to the Neon Arena! Here's how to play Rock Paper Scissors:</p>
+                <ul class="list-disc list-inside space-y-2 text-white/90">
+                    <li>Choose either <strong class="text-player-color">ROCK</strong>, <strong class="text-player-color">PAPER</strong>, or <strong class="text-player-color">SCISSORS</strong>.</li>
+                    <li>The Computer will make its choice.</li>
+                    <li>
+                        <strong>Winning Rules:</strong>
+                        <ul class="list-none ml-4 space-y-1">
+                            <li>🪨 <strong class="text-yellow-400">ROCK</strong> crushes ✂️ <strong class="text-yellow-400">SCISSORS</strong></li>
+                            <li>📄 <strong class="text-yellow-400">PAPER</strong> covers 🪨 <strong class="text-yellow-400">ROCK</strong></li>
+                            <li>✂️ <strong class="text-yellow-400">SCISSORS</strong> cuts 📄 <strong class="text-yellow-400">PAPER</strong></li>
+                        </ul>
+                    </li>
+                    <li>If both choose the same, it's a <strong class="text-yellow-400">TIE</strong>!</li>
+                    <li>Play a "Best of" series to determine the ultimate champion. The first to win more than half the rounds wins the series!</li>
+                </ul>
+                <button id="close-how-to-play-modal" class="absolute top-3 right-3 text-white text-2xl font-bold px-2 py-1 rounded-full hover:bg-white/20 transition-colors">&times;</button>
             </div>
         </div>
-    </div>
+        </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- DOM Elements ---
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const playerNameInput = document.getElementById('player-name-input');
+        const seriesLengthSelect = document.getElementById('series-length-select');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const howToPlayBtn = document.getElementById('how-to-play-btn'); // New
+        
+        const playerNameDisplay = document.getElementById('player-name-display');
+        const playerHandDiv = document.getElementById('player-hand');
+        const computerHandDiv = document.getElementById('computer-hand');
+        const gameMessage = document.getElementById('game-message');
+        const choicesContainer = document.getElementById('choices-container');
+        const choiceButtons = document.querySelectorAll('.choice-btn');
+        
+        const playerScoreSpan = document.getElementById('player-score');
+        const computerScoreSpan = document.getElementById('computer-score');
+        const tieScoreSpan = document.getElementById('tie-score');
+
+        const playerSeriesWinsSpan = document.getElementById('player-series-wins');
+        const computerSeriesWinsSpan = document.getElementById('computer-series-wins');
+        const currentSeriesLengthSpan = document.getElementById('current-series-length');
+        
+        const impactEffectDiv = document.getElementById('impact-effect');
+        const gameOverOverlay = document.getElementById('game-over-overlay');
+        const overlayMessage = document.getElementById('overlay-message');
+        const replaySeriesBtn = document.getElementById('replay-series-btn');
+        const mainMenuBtn = document.getElementById('main-menu-btn');
+        const soundToggleButton = document.getElementById('sound-toggle-btn');
+        const confettiContainer = document.getElementById('confetti-container');
+        const shareBtn = document.getElementById('share-btn');
+
+        // New Modal Elements
+        const howToPlayModal = document.getElementById('how-to-play-modal');
+        const closeHowToPlayModalBtn = document.getElementById('close-how-to-play-modal');
+
+        // New Theme Elements
+        const themeSwatches = document.querySelectorAll('.theme-swatch');
+
+        // --- Game Variables ---
+        let playerName = "Player";
+        let playerScore = 0;
+        let computerScore = 0;
+        let tieScore = 0;
+        let playerSeriesWins = 0;
+        let computerSeriesWins = 0;
+        let seriesLength = 3;
+        
+        const choices = ['rock', 'paper', 'scissors'];
+        let isSoundEnabled = true;
+        let isRoundInProgress = false;
+        let currentPlayerTheme = 'cyan'; // Default theme
+
+        // --- Image Map ---
+        const imageMap = {
+            rock: 'Rock.png',
+            paper: 'Paper.png',
+            scissors: 'Scissors.png'
+        };
+
+        // --- Sound Engine (Tone.js) ---
+        const sounds = {
+            click: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.1 } }).toDestination(),
+            win: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 0.5 } }).toDestination(),
+            lose: new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.5, sustain: 0.1, release: 0.5 } }).toDestination(),
+            tie: new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination(),
+            impact: new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0 } }).toDestination(),
+            countdown: new Tone.MembraneSynth().toDestination(),
+            seriesWin: new Tone.PolySynth(Tone.Synth, { oscillator: { type: "fatsquare" } }).toDestination()
+        };
+
+        function playSound(sound, note, duration = '8n') {
+            if (!isSoundEnabled) return;
+            if (Tone.context.state !== 'running') {
+                Tone.start();
+            }
+            sounds[sound].triggerAttackRelease(note, duration);
+        }
+        
+        function playSeriesWinSound() {
+             if (!isSoundEnabled) return;
+             if (Tone.context.state !== 'running') Tone.start();
+             const now = Tone.now();
+             sounds.seriesWin.triggerAttackRelease(["C4", "E4", "G4"], "8n", now);
+             sounds.seriesWin.triggerAttackRelease(["G4", "C5", "E5"], "8n", now + 0.2);
+             sounds.seriesWin.triggerAttackRelease(["C5", "E5", "G5"], "4n", now + 0.4);
+        }
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            Tone.Master.mute = !isSoundEnabled;
+            soundToggleButton.innerHTML = isSoundEnabled ? '🔊' : '🔇';
+            soundToggleButton.classList.toggle('bg-white/10', isSoundEnabled);
+            soundToggleButton.classList.toggle('bg-red-500/50', !isSoundEnabled);
+        }
+
+        // --- Theme Management ---
+        function setPlayerTheme(theme) {
+            document.body.classList.remove('theme-cyan', 'theme-purple', 'theme-green');
+            document.body.classList.add(`theme-${theme}`);
+            currentPlayerTheme = theme;
+            localStorage.setItem('playerTheme', theme); // Store preference
+            updatePlayerColorClasses(); // Apply dynamic Tailwind classes
+        }
+
+        // Function to update Tailwind classes that use the theme
+        function updatePlayerColorClasses() {
+            // This is a bit manual, but ensures Tailwind classes tied to player color update
+            const elementsToUpdate = [
+                { selector: '#welcome-screen', class: 'border-player-color-50/50' },
+                { selector: '#start-game-btn', class: 'bg-player-button' },
+                { selector: '#player-name-display', class: 'text-player-color' },
+                { selector: '#player-name-display', class: 'neon-text-player' },
+                { selector: '#player-score', class: 'text-player-color' },
+                { selector: '#player-series-wins', class: 'text-player-color' },
+                { selector: '#how-to-play-modal h3', class: 'neon-text-player' },
+                { selector: '#how-to-play-modal .border', class: 'border-player-color-50/50' },
+                // Loop through choices to update their borders and text
+                ...Array.from(choiceButtons).map(btn => ({ selector: `#${btn.id}`, class: 'border-player-color-50/50' })),
+                ...Array.from(choiceButtons).map(btn => ({ selector: `#${btn.id} span`, class: 'text-player-color-light' })),
+                // Dynamically update input/select borders
+                { selector: '#player-name-input', class: 'border-player-color-50/50', focusClass: 'focus:border-player-color' },
+                { selector: '#series-length-select', class: 'border-player-color-50/50', focusClass: 'focus:border-player-color' },
+            ];
+
+            elementsToUpdate.forEach(item => {
+                const elements = document.querySelectorAll(item.selector);
+                elements.forEach(el => {
+                    // Remove old theme classes if they exist (more robust)
+                    const classList = el.classList;
+                    ['border-cyan-400/50', 'border-purple-400/50', 'border-green-400/50', 
+                     'border-cyan-400', 'border-purple-400', 'border-green-400',
+                     'bg-cyan-500', 'bg-purple-500', 'bg-green-500',
+                     'text-cyan-400', 'text-purple-400', 'text-green-400',
+                     'text-cyan-200', 'text-purple-200', 'text-green-200',
+                     'neon-text-cyan', 'neon-text-purple', 'neon-text-green'].forEach(cls => {
+                        if (classList.contains(cls)) {
+                            classList.remove(cls);
+                        }
+                    });
+
+                    // Add new dynamic classes
+                    classList.add(item.class);
+                    if (item.focusClass) {
+                        // This requires more dynamic handling or simpler Tailwind setup if direct variable use is needed
+                        // For now, this just adds the new focus class, ensuring old ones are cleared by above loop
+                        classList.add(item.focusClass);
+                    }
+                });
+            });
+        }
+
+
+        // --- Game Logic ---
+        function getComputerChoice() {
+            const randomIndex = Math.floor(Math.random() * choices.length);
+            return choices[randomIndex];
+        }
+
+        function determineWinner(playerChoice, computerChoice) {
+            if (playerChoice === computerChoice) return 'tie';
+            if (
+                (playerChoice === 'rock' && computerChoice === 'scissors') ||
+                (playerChoice === 'paper' && computerChoice === 'rock') ||
+                (playerChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                return 'win';
+            }
+            return 'lose';
+        }
+        
+        function playRound(playerChoice) {
+            if (isRoundInProgress) return;
+            isRoundInProgress = true;
+            
+            playSound('click', 'C4');
+            
+            choicesContainer.classList.add('pointer-events-none', 'opacity-50');
+            gameMessage.textContent = "Ready...";
+            gameMessage.classList.remove('text-green-400', 'text-red-400', 'text-yellow-400');
+
+            playerHandDiv.innerHTML = `<img src="Rock.png" alt="Rock" class="w-full h-full object-contain">`;
+            computerHandDiv.innerHTML = `<img src="Rock.png" alt="Rock" class="w-full h-full object-contain">`;
+            
+            playerHandDiv.classList.remove('opacity-0');
+            computerHandDiv.classList.remove('opacity-0');
+            
+            playerHandDiv.classList.add('animate-hand-shake-player');
+            computerHandDiv.classList.add('animate-hand-shake-computer');
+
+            let countdown = 3;
+            gameMessage.textContent = `${countdown}`;
+            playSound('countdown', 'C3', '16n');
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    gameMessage.textContent = `${countdown}`;
+                    playSound('countdown', 'C3', '16n');
+                } else {
+                    clearInterval(countdownInterval);
+                    gameMessage.textContent = "SHOOT!";
+                    playSound('countdown', 'G4', '8n');
+                    
+                    playerHandDiv.classList.remove('animate-hand-shake-player');
+                    computerHandDiv.classList.remove('animate-hand-shake-computer');
+
+                    const computerChoice = getComputerChoice();
+
+                    playerHandDiv.style.transform = 'rotate(0deg)'; 
+                    computerHandDiv.style.transform = 'scaleX(-1) rotate(0deg)'; 
+                    
+                    playerHandDiv.innerHTML = `<img src="${imageMap[playerChoice]}" alt="${playerChoice}" class="w-full h-full object-contain">`;
+                    computerHandDiv.innerHTML = `<img src="${imageMap[computerChoice]}" alt="${computerChoice}" class="w-full h-full object-contain">`;
+                    
+                    playerHandDiv.classList.add('animate-hand-reveal');
+                    computerHandDiv.classList.add('animate-hand-reveal-computer');
+                    
+                    impactEffectDiv.classList.add('animate-impact-burst');
+                    playSound('impact');
+
+                    const result = determineWinner(playerChoice, computerChoice);
+                    updateScores(result);
+
+                    setTimeout(() => {
+                        impactEffectDiv.classList.remove('animate-impact-burst');
+                        checkSeriesOver();
+                    }, 1000);
+                }
+            }, 700);
+        }
+
+        function updateScores(result) {
+            let message = '';
+            let messageClass = '';
+            
+            if (result === 'win') {
+                playerScore++;
+                message = `${playerName} Wins!`;
+                messageClass = 'text-green-400 neon-text-green';
+                playSound('win', 'G5');
+            } else if (result === 'lose') {
+                computerScore++;
+                message = `Computer Wins!`;
+                messageClass = 'text-red-400 neon-text-pink';
+                playSound('lose', 'C3');
+            } else {
+                tieScore++;
+                message = `It's a Tie!`;
+                messageClass = 'text-yellow-400 neon-text-yellow';
+                playSound('tie', 'E4');
+            }
+            
+            setTimeout(() => {
+                gameMessage.textContent = message;
+                gameMessage.className = `text-xl md:text-3xl font-orbitron font-bold transition-all duration-300 ${messageClass}`;
+                playerScoreSpan.textContent = playerScore;
+                computerScoreSpan.textContent = computerScore;
+                tieScoreSpan.textContent = tieScore;
+            }, 300);
+        }
+
+        function checkSeriesOver() {
+            const targetWins = Math.ceil(seriesLength / 2);
+            let seriesWinner = null;
+            
+            if (playerScore >= targetWins) seriesWinner = 'player';
+            if (computerScore >= targetWins) seriesWinner = 'computer';
+
+            if (seriesWinner) {
+                if(seriesWinner === 'player') {
+                    playerSeriesWins++;
+                    overlayMessage.textContent = `${playerName} WINS THE SERIES!`;
+                    overlayMessage.className = 'text-4xl md:text-5xl font-orbitron font-bold text-green-400 neon-text-green';
+                    triggerConfetti();
+                    playSeriesWinSound();
+                } else {
+                    computerSeriesWins++;
+                    overlayMessage.textContent = 'COMPUTER WINS!';
+                    overlayMessage.className = 'text-4xl md:text-5xl font-orbitron font-bold text-red-400 neon-text-pink';
+                    playSound('lose', 'C2', '1n');
+                }
+                
+                playerSeriesWinsSpan.textContent = playerSeriesWins;
+                computerSeriesWinsSpan.textContent = computerSeriesWins;
+                
+                gameOverOverlay.classList.remove('hidden');
+                gameOverOverlay.classList.add('flex');
+            } else {
+                resetForNextRound();
+            }
+        }
+        
+        function resetForNextRound() {
+            isRoundInProgress = false;
+            choicesContainer.classList.remove('pointer-events-none', 'opacity-50');
+            playerHandDiv.classList.add('opacity-0');
+            computerHandDiv.classList.add('opacity-0');
+            playerHandDiv.classList.remove('animate-hand-reveal');
+            computerHandDiv.classList.remove('animate-hand-reveal-computer');
+            playerHandDiv.style.transform = '';
+            computerHandDiv.style.transform = ''; 
+        }
+
+        function resetGame(isNewSeries) {
+            playerScore = 0;
+            computerScore = 0;
+            tieScore = 0;
+            if(isNewSeries) {
+                playerSeriesWins = 0;
+                computerSeriesWins = 0;
+            }
+            
+            playerScoreSpan.textContent = 0;
+            computerScoreSpan.textContent = 0;
+            tieScoreSpan.textContent = 0;
+            playerSeriesWinsSpan.textContent = playerSeriesWins;
+            computerSeriesWinsSpan.textContent = computerSeriesWins;
+            
+            gameMessage.textContent = 'Choose your weapon!';
+            gameMessage.className = 'text-xl md:text-3xl font-orbitron font-bold transition-all duration-300';
+            
+            gameOverOverlay.classList.add('hidden');
+            gameOverOverlay.classList.remove('flex');
+            
+            resetForNextRound();
+        }
+
+        function triggerConfetti() {
+            confettiContainer.innerHTML = '';
+            const colors = ['#00aaff', '#ff00aa', '#aaff00', '#ffffff'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti absolute w-2 h-2 rounded-full';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = `${Math.random() * 2}s`;
+                confetti.style.animationDuration = `${2 + Math.random() * 2}s`;
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        // --- Event Listeners ---
+        startGameBtn.addEventListener('click', () => {
+            playerName = playerNameInput.value.trim() || 'Player';
+            seriesLength = parseInt(seriesLengthSelect.value);
+            
+            playerNameDisplay.textContent = playerName;
+            currentSeriesLengthSpan.textContent = seriesLength;
+            
+            playSound('click', 'E5');
+
+            welcomeScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('animate-fade-in');
+            
+            resetGame(true);
+        });
+
+        choiceButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                playRound(button.id);
+            });
+        });
+
+        replaySeriesBtn.addEventListener('click', () => {
+            playSound('click', 'E5');
+            resetGame(false);
+        });
+
+        mainMenuBtn.addEventListener('click', () => {
+             playSound('click', 'C5');
+             gameScreen.classList.add('hidden');
+             welcomeScreen.classList.remove('hidden');
+        });
+        
+        soundToggleButton.addEventListener('click', toggleSound);
+
+        // How to Play Modal Listeners
+        howToPlayBtn.addEventListener('click', () => {
+            howToPlayModal.classList.remove('hidden');
+            howToPlayModal.classList.add('flex');
+        });
+
+        closeHowToPlayModalBtn.addEventListener('click', () => {
+            howToPlayModal.classList.add('hidden');
+            howToPlayModal.classList.remove('flex');
+        });
+
+        // Theme Selection Listeners
+        themeSwatches.forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                const theme = swatch.dataset.theme;
+                setPlayerTheme(theme);
+                playSound('click', 'A4'); // Small sound for theme change
+            });
+        });
+
+
+        // --- Share Button Logic ---
+        shareBtn.addEventListener('click', () => {
+            // Use the Web Share API if available
+            if (navigator.share) {
+                const resultText = overlayMessage.textContent;
+                navigator.share({
+                    title: 'Rock Paper Scissors - Neon Edition',
+                    text: `I just played a series of Rock Paper Scissors! Result: ${resultText}`,
+                    url: window.location.href // Shares the current page URL
+                }).then(() => {
+                    console.log('Thanks for sharing!');
+                }).catch(console.error);
+            } else {
+                // Fallback for browsers that do not support the Web Share API
+                alert('Sharing is not supported on your browser, but you can copy the link manually!');
+            }
+        });
+
+        // Initial setup on load
+        const savedTheme = localStorage.getItem('playerTheme') || 'cyan';
+        setPlayerTheme(savedTheme);
+    });
+</script>
 <a href="./" class="game-box hidden-initial"></a>
-    <script src="script.js"></script>
 </body>
 </html>
