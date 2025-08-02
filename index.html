@@ -21,7 +21,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <div id="search-bar" class="search-container hidden md:flex">
+            <div id="desktop-search-bar" class="search-container hidden md:flex">
                 <span class="search-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -29,6 +29,13 @@
                 </span>
                 <input type="text" id="searchInput" class="search-input" placeholder="Search for a game...">
             </div>
+            
+            <button id="mobile-search-btn" class="header-icon-btn md:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+            
             <nav class="flex gap-2">
                  <button id="play-with-friends-btn" class="header-icon-btn">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -45,18 +52,21 @@
         </div>
     </header>
 
+    <div id="mobile-search-overlay" class="fixed top-16 left-0 w-full p-4 hidden bg-gray-900/80 backdrop-blur-md border-b border-gray-700">
+        <div class="search-container mx-auto">
+            <span class="search-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+            </span>
+            <input type="text" id="mobileSearchInput" class="search-input" placeholder="Search for a game...">
+        </div>
+    </div>
+
     <main class="flex-1">
        
         <section id="hero" class="text-center pt-16 pb-16 px-5">
-            <div id="mobile-search-bar" class="search-container md:hidden">
-                 <span class="search-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                    </svg>
-                </span>
-                <input type="text" id="mobileSearchInput" class="search-input" placeholder="Search for a game...">
-            </div>
-        </section>
+            </section>
        
         <section id="game-matrix" class="px-4 md:px-8 max-w-7xl mx-auto">
             <div id="new-game-grid" class="new-game-grid">
@@ -99,7 +109,7 @@
                 </div>
 
                 <p class="footer-email mt-8"></p>
-                <a href="./privacy" class="footer-privacy text-gray-400 hover:text-indigo-400">Privacy policy📜</a>
+                <a href="./privacy.html" class="footer-privacy text-gray-400 hover:text-indigo-400">Privacy policy📜</a>
             </div>
         </div>
     </footer>
