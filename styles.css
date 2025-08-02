@@ -25,6 +25,13 @@ body {
     color: #f9fafb;
     transform: scale(1.05);
 }
+.header-icon-btn.mobile-menu-btn {
+    width: 100%;
+    height: auto;
+    border-radius: 9999px;
+    padding: 0.75rem 1rem;
+    justify-content: flex-start;
+}
 
 /* --- Search Bar Styles --- */
 .search-container {
@@ -311,6 +318,13 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1rem;
 }
+.header-icon-btn.mobile-menu-btn svg {
+    margin-right: 0.5rem;
+}
+.header-icon-btn.mobile-menu-btn span {
+    display: inline;
+}
+
 
 /* Tablet and Desktop Styles (for screens 768px and wider) */
 @media (min-width: 768px) {
@@ -322,6 +336,9 @@ body {
     .new-game-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 1.5rem;
+    }
+    .header-icon-btn.mobile-menu-btn span {
+        display: none;
     }
 }
 
