@@ -13,27 +13,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const games = [
-        { title: 'Rock Paper Scissors', icon: '✌️', rating: 4.5, url: './Rock-Paper-Scissor/', thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
-        { title: 'Perfect Circle', icon: '⚪', rating: 4.8, url: './CIRCLE/', thumbnail: './images/perfect-circle.png', isFavorite: false },
-        { title: 'Vegan Cobra', icon: '🐍', rating: 4.2, url: './Vegan-Cobra/', thumbnail: './images/vegan-cobra.png', isFavorite: false },
-        { title: 'Mind Bender', icon: '🧩', rating: 4.6, url: '#', thumbnail: './images/mind-bender.png', isFavorite: false },
-        { title: 'Project: Nexus', icon: '🔫', rating: 3.9, url: '#', thumbnail: null, isFavorite: false },
-        { title: 'Void: Construct', icon: '🧱', rating: 4.0, url: '#', thumbnail: null, isFavorite: false },
-        { title: 'Arcade Racer', icon: '🕹️', rating: 4.7, url: '#', thumbnail: null, isFavorite: false },
-        { title: 'Another Puzzle', icon: '🧠', rating: 4.3, url: '#', thumbnail: null, isFavorite: false },
-        { title: 'Tile Match', icon: '🀄', rating: 4.9, url: '#', thumbnail: null, isFavorite: false },
-        { title: 'Word Finder', icon: '✍️', rating: 4.4, url: '#', thumbnail: null, isFavorite: false }
+       { title: 'Rock Paper Scissors', icon: '✌️', rating: 4.5, url: './Rock-Paper-Scissor/', thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Perfect Circle', icon: '⚪', rating: 4.8, url: './CIRCLE/',thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Vegan Cobra', icon: '🐍', rating: 4.2, url: './Vegan-Cobra/', thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Mind Bender', icon: '🧩', rating: 4.6, url: '#',thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Project: Nexus', icon: '🔫', rating: 3.9, url: '#', thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Void: Construct', icon: '🧱', rating: 4.0, url: '#', thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Arcade Racer', icon: '🕹️', rating: 4.7, url: '#', thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Another Puzzle', icon: '🧠', rating: 4.3, url: '#',thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Tile Match', icon: '🀄', rating: 4.9, url: '#',thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
+        { title: 'Word Finder', icon: '✍️', rating: 4.4, url: '#',thumbnail: './images/rock-paper-scissors.png', isFavorite: false },
     ];
 
     const gameGrid = document.getElementById('new-game-grid');
     const searchInput = document.getElementById('searchInput');
     const mobileSearchInput = document.getElementById('mobileSearchInput');
 
+    // --- Modal Elements ---
     const modalOverlay = document.getElementById('modal-overlay');
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
     const modalCloseBtn = document.getElementById('modal-close-btn');
 
+    // Function to render the star ratings
     const getStarRating = (rating) => {
         const fullStar = '<svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>';
         const emptyStar = '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>';
@@ -44,10 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return starsHTML;
     };
     
+    // Function to handle favoriting a game
     const toggleFavorite = (title) => {
         const game = games.find(g => g.title === title);
         if (game) {
             game.isFavorite = !game.isFavorite;
+            // Re-render the games on the main page and in the modal if it's open
             renderGames(games, gameGrid);
             if (!modalOverlay.classList.contains('hidden') && modalTitle.textContent === 'Favorite Games') {
                 renderFavoritesInModal();
@@ -55,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Function to render games in a specific grid
     const renderGames = (gamesToRender, gridElement) => {
         gridElement.innerHTML = '';
         if (gamesToRender.length === 0) {
@@ -96,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Function to render favorites inside the modal
     const renderFavoritesInModal = () => {
         const filteredFavorites = games.filter(game => game.isFavorite);
         modalBody.innerHTML = '';
@@ -110,18 +116,21 @@ document.addEventListener('DOMContentLoaded', () => {
         modalBody.appendChild(favoritesGrid);
     };
 
+    // Function to show the modal
     const showModal = (title, contentHTML) => {
         modalTitle.textContent = title;
         modalBody.innerHTML = contentHTML;
         modalOverlay.classList.remove('hidden');
     };
 
+    // Event listeners for header buttons to open the modal
     document.getElementById('play-with-friends-btn').addEventListener('click', () => {
         const comingSoonHTML = `
             <div class="coming-soon-card relative overflow-hidden rounded-xl h-48 md:h-64 flex items-center justify-center m-4">
                 <div class="coming-soon-overlay"></div>
                 <div class="relative z-10 text-center">
-                    <p class="text-lg text-gray-300">Coming Soon</p>
+                    <h3 class="text-2xl md:text-4xl font-bold text-white mb-2"></h3>
+                    <p class="text-lg text-gray-400">Coming Soon</p>
                 </div>
             </div>
         `;
@@ -133,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showModal('Favorite Games', modalBody.innerHTML);
     });
 
+    // Event listeners to close the modal
     modalCloseBtn.addEventListener('click', () => {
         modalOverlay.classList.add('hidden');
     });
@@ -143,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Event listeners for the search input
     const handleSearch = (e) => {
         const query = e.target.value.toLowerCase();
         const filteredGames = games.filter(game =>
@@ -152,7 +163,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     searchInput.addEventListener('keyup', handleSearch);
-    mobileSearchInput.addEventListener('keyup', handleSearch);
+    
+    // New code for mobile search functionality
+    const mobileSearchBtn = document.getElementById('mobile-search-btn');
+    const mobileSearchOverlay = document.getElementById('mobile-search-overlay');
 
+    if (mobileSearchBtn && mobileSearchOverlay) {
+        mobileSearchBtn.addEventListener('click', () => {
+            mobileSearchOverlay.classList.toggle('hidden');
+        });
+    }
+    
+    if (mobileSearchInput) {
+        mobileSearchInput.addEventListener('keyup', handleSearch);
+    }
+    
+    // Site logo click event
+    const siteLogo = document.getElementById('site-logo');
+    if (siteLogo) {
+        siteLogo.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // Initial render of all games on the main page
     renderGames(games, gameGrid);
 });
