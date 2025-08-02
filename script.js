@@ -141,15 +141,26 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFavoritesInModal();
         showModal('Favorite Games', modalBody.innerHTML);
     });
-    
+
     // New Event listeners for mobile menu buttons
     document.getElementById('mobile-play-with-friends-btn').addEventListener('click', () => {
-        showModal('Play With Friends', '...');
+        const comingSoonHTML = `
+            <div class="coming-soon-card relative overflow-hidden rounded-xl h-48 md:h-64 flex items-center justify-center m-4">
+                <div class="coming-soon-overlay"></div>
+                <div class="relative z-10 text-center">
+                    <h3 class="text-2xl md:text-4xl font-bold text-white mb-2"></h3>
+                    <p class="text-lg text-gray-400">Coming Soon</p>
+                </div>
+            </div>
+        `;
+        showModal('Play With Friends', comingSoonHTML);
     });
+
     document.getElementById('mobile-favorite-games-btn').addEventListener('click', () => {
         renderFavoritesInModal();
-        showModal('Favorite Games', '...');
+        showModal('Favorite Games', modalBody.innerHTML);
     });
+
     document.getElementById('mobile-updates-btn').addEventListener('click', () => {
         // You can add logic to scroll to the newsletter section here
         window.location.href = '#footer-newsletter';
@@ -183,10 +194,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
+    const hideOverlays = () => {
+        mobileSearchOverlay.classList.add('hidden');
+        mobileMenuOverlay.classList.add('hidden');
+    };
+
     if (mobileSearchBtn && mobileSearchOverlay) {
         mobileSearchBtn.addEventListener('click', () => {
             mobileSearchOverlay.classList.toggle('hidden');
-            // Ensure menu is hidden when search is shown
             mobileMenuOverlay.classList.add('hidden');
         });
     }
@@ -194,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mobileMenuBtn && mobileMenuOverlay) {
         mobileMenuBtn.addEventListener('click', () => {
             mobileMenuOverlay.classList.toggle('hidden');
-            // Ensure search is hidden when menu is shown
             mobileSearchOverlay.classList.add('hidden');
         });
     }
@@ -202,6 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mobileSearchInput) {
         mobileSearchInput.addEventListener('keyup', handleSearch);
     }
+    
+    // Hide overlays on scroll
+    window.addEventListener('scroll', hideOverlays);
     
     // Site logo click event
     const siteLogo = document.getElementById('site-logo');
