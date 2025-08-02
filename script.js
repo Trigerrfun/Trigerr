@@ -141,6 +141,19 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFavoritesInModal();
         showModal('Favorite Games', modalBody.innerHTML);
     });
+    
+    // New Event listeners for mobile menu buttons
+    document.getElementById('mobile-play-with-friends-btn').addEventListener('click', () => {
+        showModal('Play With Friends', '...');
+    });
+    document.getElementById('mobile-favorite-games-btn').addEventListener('click', () => {
+        renderFavoritesInModal();
+        showModal('Favorite Games', '...');
+    });
+    document.getElementById('mobile-updates-btn').addEventListener('click', () => {
+        // You can add logic to scroll to the newsletter section here
+        window.location.href = '#footer-newsletter';
+    });
 
     // Event listeners to close the modal
     modalCloseBtn.addEventListener('click', () => {
@@ -164,16 +177,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchInput.addEventListener('keyup', handleSearch);
     
-    // New code for mobile search functionality
+    // Mobile search and menu functionality
     const mobileSearchBtn = document.getElementById('mobile-search-btn');
     const mobileSearchOverlay = document.getElementById('mobile-search-overlay');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
     if (mobileSearchBtn && mobileSearchOverlay) {
         mobileSearchBtn.addEventListener('click', () => {
             mobileSearchOverlay.classList.toggle('hidden');
+            // Ensure menu is hidden when search is shown
+            mobileMenuOverlay.classList.add('hidden');
         });
     }
-    
+
+    if (mobileMenuBtn && mobileMenuOverlay) {
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenuOverlay.classList.toggle('hidden');
+            // Ensure search is hidden when menu is shown
+            mobileSearchOverlay.classList.add('hidden');
+        });
+    }
+
     if (mobileSearchInput) {
         mobileSearchInput.addEventListener('keyup', handleSearch);
     }
