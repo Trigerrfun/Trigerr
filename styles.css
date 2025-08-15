@@ -214,3 +214,85 @@ html, body {
     justify-self: end;
   }
 }
+/* ========================= */
+/*   Mobile UI Improvements  */
+/* ========================= */
+@media (max-width: 768px) {
+  /* Make header more compact */
+  .nav {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .brand span {
+    font-size: 16px;
+  }
+  .logo {
+    width: 28px;
+    border-radius: 8px;
+  }
+  .logo span {
+    font-size: 14px;
+  }
+
+  /* Reduce button padding & font size */
+  .btn {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  /* Compact hero section */
+  .hero {
+    padding: 12px 10px;
+  }
+  .hero h1 {
+    font-size: 20px;
+  }
+  .hero p {
+    font-size: 14px;
+  }
+
+  /* Smaller search bar */
+  .search {
+    padding: 6px 8px;
+  }
+  .search input {
+    font-size: 14px;
+  }
+
+  /* Smaller category pills */
+  .pill {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  /* Smaller game cards */
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    border-radius: 10px;
+  }
+  .title {
+    font-size: 14px;
+  }
+  .meta {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Further compact for very small phones */
+  .hero h1 {
+    font-size: 18px;
+  }
+  .hero p {
+    font-size: 13px;
+  }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+}
+
