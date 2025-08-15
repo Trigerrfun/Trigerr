@@ -47,3 +47,15 @@ function initFilters() {
     applyFilters();
   }));
 }
+// Mobile menu toggle
+document.addEventListener('DOMContentLoaded', function() {
+  const menuBtn = document.querySelector('.menu-toggle');
+  const navLinks = document.querySelector('.links');
+
+  if (menuBtn && navLinks) {
+    menuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('show');
+    });
+  }
+});
+
