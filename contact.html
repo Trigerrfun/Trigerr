@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us - Trigerr.fun</title>
+  <meta name="description" content="Contact Trigerr.fun - Free Online HTML5 Games">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .contact-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+    .contact-container h1 {
+      margin-bottom: 20px;
+    }
+    .contact-container p {
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #1e1e1e;
+      color: #fff;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #666;
+    }
+    button {
+      background: #ff5722;
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #e64a19;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/">
+        <div class="logo"><span>T</span></div>
+        <span>Trigerr.fun</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="contact-container">
+    <h1>Contact Us</h1>
+    <p>We’d love to hear from you! Whether you have feedback, suggestions, or found a bug in one of our games, please reach out to us.</p>
+    <p>You can contact us directly by email at: <a href="mailto:asktrigerr@gmail.com">asktrigerr@gmail.com</a> or use the form below:</p>
+
+    <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <input type="text" name="name" placeholder="Your Name" required />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <textarea name="message" rows="6" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </main>
+
+  <footer>
+    <div class="container footer">
+      <div>© <span id="year"></span> Trigerr.fun</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
