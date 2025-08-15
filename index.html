@@ -1,166 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <!-- This viewport tag is essential for responsiveness and is correctly implemented. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trigerr.fun</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="styles.css">
-    
-    <link rel="icon" href="T - Favicon.png" type="image/x-icon" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trigerr.fun — Play Free Online Games</title>
+  <meta name="description" content="Play fast, free HTML5 games on Trigerr.fun. No installs. New games added regularly." />
+  <link rel="canonical" href="https://trigerr.fun/" />
+  <meta property="og:title" content="Trigerr.fun — Play Free Online Games" />
+  <meta property="og:description" content="Fast, free HTML5 games. No installs. Play now!" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://trigerr.fun/" />
+  <meta name="theme-color" content="#0e0e12" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="gamesheet" href="games.html" />
 </head>
-<body class="bg-gray-900 text-gray-200" style="padding-top: 0px;"> <!-- Added padding to prevent content from hiding behind the fixed header -->
-
-    <header class="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-center px-4 md:px-8 bg-gray-900/80 backdrop-blur-md border-b border-gray-700">
-        <div class="site-logo text-3xl cursor-pointer font-bold text-white" id="site-logo">
-            Trigerr<span class="text-indigo-400">.fun</span>
-        </div>
-
-        <div class="flex items-center gap-4">
-            <div id="desktop-search-bar" class="search-container hidden md:flex">
-                <span class="search-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                    </svg>
-                </span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Search for a game...">
-            </div>
-            
-            <button id="mobile-menu-btn" class="header-icon-btn md:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-            
-            <button id="mobile-search-btn" class="header-icon-btn md:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </button>
-            
-            <nav id="desktop-nav" class="hidden md:flex gap-2">
-                 <button id="play-with-friends-btn" class="header-icon-btn">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h-1.58C13.235 20 12 18.765 12 17.22V15a2 2 0 00-2-2H8a2 2 0 00-2 2v2.22c0 1.545-1.235 2.78-2.42 2.78H2m12-2a2 2 0 100-4 2 2 0 000 4zM6 16a2 2 0 100-4 2 2 0 000 4zM12 4a3 3 0 100 6 3 3 0 000-6z" />
-                     </svg>
-                 </button>
-                 <button id="favorite-games-btn" class="header-icon-btn">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                     </svg>
-                 </button>
-                 <a href="#footer-newsletter" class="header-cta-btn text-sm">✉️Get Updates</a>
-            </nav>
-        </div>
-    </header>
-
-    <div id="mobile-search-overlay" class="fixed top-16 left-0 w-full p-4 hidden bg-gray-900/80 backdrop-blur-md border-b border-gray-700 z-40">
-        <div class="search-container mx-auto">
-            <span class="search-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
-            </span>
-            <input type="text" id="mobileSearchInput" class="search-input" placeholder="Search for a game...">
-        </div>
+<body>
+  <header>
+    <div class="container nav" role="navigation" aria-label="Primary">
+      <a class="brand" href="/" aria-label="Trigerr.fun home">
+        <div class="logo" aria-hidden="true"><span>T</span></div>
+        <span>Trigerr.fun</span>
+      </a>
+      <nav class="links">
+        <a href="#" aria-current="page">Home</a>
+        <a href="#games">Games</a>
+        <a href="#friends">Play with Friends</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="cta">
+        <a class="btn" href="#newsletter">Get Updates</a>
+        <a class="btn btn--primary" href="#featured">Play Now</a>
+      </div>
     </div>
-    
-    <nav id="mobile-menu-overlay" class="fixed top-16 left-0 w-full p-4 hidden bg-gray-900/80 backdrop-blur-md border-b border-gray-700 z-40">
-        <div class="flex flex-col gap-4 items-center">
-            <button id="mobile-play-with-friends-btn" class="header-icon-btn mobile-menu-btn w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h-1.58C13.235 20 12 18.765 12 17.22V15a2 2 0 00-2-2H8a2 2 0 00-2 2v2.22c0 1.545-1.235 2.78-2.42 2.78H2m12-2a2 2 0 100-4 2 2 0 000 4zM6 16a2 2 0 100-4 2 2 0 000 4zM12 4a3 3 0 100 6 3 3 0 000-6z" />
-                </svg>
-                <span>Play with Friends</span>
-            </button>
-            <button id="mobile-favorite-games-btn" class="header-icon-btn mobile-menu-btn w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span>Favorite Games</span>
-            </button>
-            <a href="#footer-newsletter" id="mobile-updates-btn" class="header-cta-btn text-sm w-full">
-                <span class="mr-2">✉️</span>
-                <span>Get Updates</span>
-            </a>
-        </div>
-    </nav>
+    <!-- Add in <head> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</footer>
 
-    <main class="flex-1">
-       
-        <section id="hero" class="text-center pt-16 pb-16 px-5">
-            <!-- Hero content goes here -->
-        </section>
-       
-        <section id="game-matrix" class="px-4 md:px-8 max-w-7xl mx-auto">
-            <div id="new-game-grid" class="new-game-grid">
-                <!-- Game cards will be populated by script.js -->
-            </div>
-       </section>
-    </main>
+  </header>
 
-    <footer id="footer-newsletter" class="bg-gray-800 mt-16">
-        <div class="max-w-7xl mx-auto px-4 py-16 text-center">
-            <h2 class="text-3xl font-bold text-white mb-4">Get Notified About New Games</h2>
-            <p class="footer-intro mb-6 max-w-xl mx-auto text-gray-400">
-                Subscribe to our newsletter and be the first to know when new free-to-play web games are released. No spam, just fun.
-            </p>
-            
-            <form class="max-w-md mx-auto flex flex-col sm:flex-row gap-2"> <!-- Ensures form stacks on small screens -->
-                <input type="email" placeholder="your.email@example.com" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500" required>
-                <button type="submit" class="header-cta-btn flex-shrink-0">Subscribe</button>
-            </form>
+  <main class="container">
+    <section class="hero" id="featured">
+      <h1>Play Free HTML5 Games — No Installs</h1>
+      <p>Fast-loading, mobile-friendly games. Pick a category and jump in!</p>
+    </section>
 
-            <div class="mt-12">
-                 <div class="footer-buttons-container flex flex-wrap justify-center items-center gap-4">
-                    <a href="#" class="flex items-center bg-gray-700 text-gray-200 font-semibold py-2 px-5 border-2 border-gray-600 rounded-full hover:bg-gradient-to-r from-purple-500 to-indigo-500 hover:text-white hover:border-transparent transition-all duration-300 transform hover:scale-105">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
-                        </svg>
-                        <span class="ml-2">Facebook</span>
-                    </a>
-                    <a href="#" class="flex items-center bg-gray-700 text-gray-200 font-semibold py-2 px-5 border-2 border-gray-600 rounded-full hover:bg-gradient-to-r from-purple-500 to-indigo-500 hover:text-white hover:border-transparent transition-all duration-300 transform hover:scale-105">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                        </svg>
-                        <span class="ml-2">Twitter</span>
-                    </a>
-                    <a href="https://buymeacoffee.com/" class="flex items-center bg-gray-700 text-gray-200 font-semibold py-2 px-5 border-2 border-gray-600 rounded-full hover:bg-gradient-to-r from-purple-500 to-indigo-500 hover:text-white hover:border-transparent transition-all duration-300 transform hover:scale-105">
-                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 2c-4.418 0-8 3.582-8 8 0 1.454.387 2.809 1.059 4H4c-1.103 0-2 .897-2 2v2c0 1.103.897 2 2 2h1v2h2v-2h6v2h2v-2h1c1.103 0 2-.897 2-2v-2c0-1.103-.897-2-2-2h-.059A7.96 7.96 0 0 0 20 10c0-4.418-3.582-8-8-8zm0 2c3.314 0 6 2.686 6 6s-2.686 6-6 6-6-2.686-6-6 2.686-6 6-6zM4 16h16v2H4v-2z"/>
-                        </svg>
-                        <span class="ml-2">Buy me a coffee</span>
-                    </a>
-                </div>
-
-                <p class="footer-email mt-8"></p>
-                <a href="./privacy.html" class="footer-privacy text-gray-400 hover:text-indigo-400">Privacy policy📜</a>
-            </div>
-        </div>
-    </footer>
-    
-    <div id="modal-overlay" class="modal-overlay hidden">
-        <div id="modal-container" class="modal-container">
-            <div class="modal-header">
-                <h2 id="modal-title" class="text-2xl font-bold"></h2>
-                <button id="modal-close-btn" class="modal-close-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div id="modal-body" class="modal-body">
-                <!-- Modal content will be populated by script.js -->
-            </div>
-        </div>
+    <div class="toolbar" aria-label="Game controls">
+      <label class="search" aria-label="Search games">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="#9aa0a6" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input id="search" type="search" placeholder="Search games (e.g., puzzle, racing)" autocomplete="off" />
+      </label>
+      <div class="pills" role="tablist" aria-label="Categories">
+        <button class="pill" data-filter="all" data-active="true">All</button>
+        <button class="pill" data-filter="action">Action</button>
+        <button class="pill" data-filter="adventure">Adventure</button>
+        <button class="pill" data-filter="puzzle">Puzzle</button>
+        <button class="pill" data-filter="arcade">Arcade</button>
+        <button class="pill" data-filter="retro">Retro</button>
+        <button class="pill" data-filter="multiplayer">Multiplayer</button>
+      </div>
     </div>
 
-    <script src="script.js"></script>
+    <section class="section" id="games" aria-live="polite">
+      <h2>Trending Games</h2>
+      <div class="grid" id="grid"></div>
+    </section>
+    <div class="grid" id="grid"></div>
 
+    <section class="section" id="newsletter">
+      <h2>Get New Games in Your Inbox</h2>
+      <p class="meta">No spam. Just the best free-to-play web games.</p>
+      <form class="toolbar" action="https://formsubmit.co/" method="post" onsubmit="alert('Thanks! You\'re in.');">
+        <label class="search" aria-label="Email address">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7l8 6 8-6" stroke="#9aa0a6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input type="email" name="email" placeholder="you@example.com" required />
+        </label>
+        <button class="btn btn--primary" type="submit">Subscribe</button>
+      </form>
+    </section>
+
+    <section class="section" id="friends">
+      <h2>Play with Friends</h2>
+      <p class="meta">Coming soon: quick rooms for 2–4 players. Share a link, start a match.</p>
+      <div class="actions"><a class="btn" href="#newsletter">Get notified</a></div>
+    </section>
+  </main>
+<footer>
+  <div class="container footer">
+    <div>© <span id="year"></span> Trigerr.fun</div>
+    <div class="footer-links">
+      <!-- Privacy -->
+      <a href="./privacy.html">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+          <path d="M7 10V8a5 5 0 0 1 10 0v2"></path>
+        </svg>
+        <span>Privacy</span>
+      </a>
+
+      <!-- Terms -->
+      <a href="./terms.html">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 3h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path>
+          <path d="M14 3v6h6"></path>
+          <path d="M9 13h6M9 17h6"></path>
+        </svg>
+        <span>Terms</span>
+      </a>
+
+      <!-- Contact -->
+      <a href="./contact.html">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+          <path d="M3 7l9 6 9-6"></path>
+        </svg>
+        <span>Contact</span>
+      </a>
+
+      <!-- Discord -->
+      <a href="https://discord.gg/YourInviteCode" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 245 240" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" d="M104.4 104.8c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.2-5 10.2-11.1s-4.5-11.1-10.2-11.1zm36.2 0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.2-5 10.2-11.1s-4.5-11.1-10.2-11.1z"/>
+          <path fill="currentColor" d="M189.5 20h-134C36.3 20 20 36.3 20 55.5v129C20 203.7 36.3 220 55.5 220h110.3l-5.2-18.1 12.6 11.7 11.9 11.1 21.1 19V55.5c0-19.2-16.3-35.5-35.5-35.5z"/>
+        </svg>
+        <span>Discord</span>
+      </a>
+
+      <!-- Facebook -->
+      <a href="https://facebook.com/YourPageName" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88v-6.99h-2.54v-2.89h2.54V9.41c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.77l-.44 2.89h-2.33v6.99C18.34 21.13 22 17 22 12z"/>
+        </svg>
+        <span>Facebook</span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
-
