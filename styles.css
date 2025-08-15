@@ -155,3 +155,24 @@ footer { margin-top: 36px; border-top: 1px solid #1f2430; }
     justify-self: center;
   }
 }
+/* Prevent media from overflowing on small screens */
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+/* Remove unwanted horizontal scroll */
+html, body {
+  overflow-x: hidden;
+}
+@media (max-width: 360px) {
+  .grid {
+    grid-template-columns: 1fr; /* Single column for very small devices */
+  }
+}
+@media (max-width: 480px) {
+  .search input {
+    font-size: 18px;
+    padding: 8px;
+  }
+}
