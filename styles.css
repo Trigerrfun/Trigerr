@@ -77,16 +77,17 @@ body {
 /* --- New Game Grid Styles --- */
 .new-game-grid {
     display: grid;
+    /* This is a perfect responsive pattern. It creates as many columns as can fit,
+       with a minimum width of 250px, and they'll grow to fill the space. */
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
 }
 
-/* --- MORE TRANSPARENT GAME CARD STYLES --- */
+/* --- Game Card Styles --- */
 .game-card {
     background-color: transparent;
     border-radius: 1rem;
     overflow: hidden;
-    /* The border is now semi-transparent */
     border: 1px solid rgba(55, 65, 81, 0.5);
     text-decoration: none;
     color: inherit;
@@ -103,7 +104,7 @@ body {
 
 .game-thumbnail {
     width: 100%;
-    height: auto;
+    height: auto; /* This ensures images scale proportionally */
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 0.75rem;
@@ -113,14 +114,13 @@ body {
     font-size: 4rem;
     text-align: center;
     padding: 2rem 1rem;
-    background-color: transparent;
     line-height: 1;
     border-radius: 0.75rem;
     height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(55, 65, 81, 0.5); /* Matching semi-transparent border */
+    border: 1px solid rgba(55, 65, 81, 0.5);
 }
 
 .game-card-content {
@@ -128,7 +128,6 @@ body {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    /* The gradient is now more transparent (0.8 opacity) */
     background: linear-gradient(to top, rgba(17, 24, 39, 0.8) 50%, transparent);
     margin-top: -60px;
     position: relative;
@@ -218,24 +217,6 @@ body {
     fill: currentColor;
 }
 
-/* --- "Play with Friends" Card Styles (used in modal) --- */
-.coming-soon-card {
-    background-image: url('https://placehold.co/1200x400/111827/d1d5db?text=Play+with+Friends+Feature');
-    background-size: cover;
-    background-position: center;
-    border: 1px solid #374151;
-}
-
-.coming-soon-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(17, 24, 39, 0.7);
-    z-index: 5;
-}
-
 /* --- Modal Styles --- */
 .modal-overlay {
     position: fixed;
@@ -255,21 +236,14 @@ body {
     background-color: #1f2937;
     border-radius: 1rem;
     padding: 1.5rem;
+    /* Using max-width ensures the modal doesn't get too wide on large screens,
+       while width: 90% (or similar) would make it flexible on small screens.
+       Your Tailwind classes handle this well. */
     max-width: 90%;
     width: 700px;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    transform: scale(0.9);
-    opacity: 0;
-    animation: scaleIn 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes scaleIn {
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
 }
 
 .modal-header {
@@ -299,52 +273,4 @@ body {
 
 .hidden {
     display: none;
-}
-
-/* --- Media Queries for Responsiveness --- */
-
-/* Mobile-first styles (default) */
-.header-icon-btn {
-    width: 40px;
-    height: 40px;
-}
-
-.search-container {
-    max-width: 100%;
-    margin-right: 1rem;
-}
-
-.new-game-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
-}
-.header-icon-btn.mobile-menu-btn svg {
-    margin-right: 0.5rem;
-}
-.header-icon-btn.mobile-menu-btn span {
-    display: inline;
-}
-
-
-/* Tablet and Desktop Styles (for screens 768px and wider) */
-@media (min-width: 768px) {
-    .header-icon-btn {
-        width: 48px;
-        height: 48px;
-    }
-    
-    .new-game-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1.5rem;
-    }
-    .header-icon-btn.mobile-menu-btn span {
-        display: none;
-    }
-}
-
-/* Large Desktop Styles (for screens 1024px and wider) */
-@media (min-width: 1024px) {
-    .search-container {
-        max-width: 500px;
-    }
 }
