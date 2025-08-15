@@ -155,24 +155,62 @@ footer { margin-top: 36px; border-top: 1px solid #1f2430; }
     justify-self: center;
   }
 }
-/* Prevent media from overflowing on small screens */
-img, video {
+/* Ensure game canvas scales on all devices */
+canvas {
   max-width: 100%;
   height: auto;
   display: block;
 }
-/* Remove unwanted horizontal scroll */
+iframe {
+  max-width: 100%;
+  height: auto;
+  border: none;
+  display: block;
+}
+/* ===== Responsive Media Fixes ===== */
+img, video, iframe, canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Prevent unwanted horizontal scroll */
 html, body {
   overflow-x: hidden;
 }
+
+/* Single column grid for very small screens */
 @media (max-width: 360px) {
   .grid {
-    grid-template-columns: 1fr; /* Single column for very small devices */
+    grid-template-columns: 1fr;
   }
 }
-@media (max-width: 480px) {
-  .search input {
-    font-size: 18px;
-    padding: 8px;
+
+/* ===== Mobile Menu ===== */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .links {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    padding: 12px;
+    border-radius: 12px;
+  }
+  .links.show {
+    display: flex;
+  }
+  .menu-toggle {
+    display: block;
+    justify-self: end;
   }
 }
