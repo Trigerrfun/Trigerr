@@ -96,3 +96,62 @@ footer { margin-top: 36px; border-top: 1px solid #1f2430; }
   align-items: center;
   gap: 6px; /* space between lines if there are multiple rows */
 }
+/* =================================== */
+/* Responsive Fixes for Smaller Screens */
+/* =================================== */
+
+@media (max-width: 768px) {
+  /*
+   * Adjusts the header navigation for tablets and mobiles.
+   * Stacks the brand, links, and CTA buttons vertically
+   * and centers them for a clean look on narrow screens.
+  */
+  .nav {
+    grid-template-columns: 1fr; /* Switch to a single-column layout */
+    gap: 20px;
+    padding: 16px 20px;
+  }
+
+  .links {
+    justify-content: center; /* Center the navigation links */
+    flex-wrap: wrap;         /* Allow links to wrap if needed */
+  }
+
+  .cta {
+    justify-self: center; /* Center the CTA buttons */
+  }
+
+  /*
+   * Stacks the search bar and filter pills on top of each other
+   * instead of side-by-side to prevent them from squeezing together.
+  */
+  .toolbar {
+    grid-template-columns: 1fr; /* Make the toolbar a single column */
+  }
+
+  /*
+   * Centers the footer links for a tidy appearance on mobile.
+  */
+  .footer-links {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  /*
+   * Reduces padding on the main hero section to give more
+   * space to the content on very small mobile screens.
+  */
+  .hero {
+    padding: 16px 16px 8px;
+  }
+
+  /*
+   * Ensures the call-to-action buttons in the header
+   * don't take up the full width and are centered nicely.
+  */
+  .cta {
+    display: inline-flex;
+    justify-self: center;
+  }
+}
