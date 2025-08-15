@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Life in Numbers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Root variables for theme colors (Defaulting to light mode) */
+        :root {
+            --bg-color: #f0f9ff; /* Pale Blue Background */
+            --text-color: #1e293b; /* Darker Slate Text */
+            --label-color: #64748b; /* Lighter Slate Gray */
+            --accent-color: #06b6d4; /* Cyan Accent (modern, calm) */
+            --card-bg: #ffffff; /* White background for cards */
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Soft shadow for cards */
+            --button-text-color: #ffffff; /* White text on accent for buttons */
+            --gradient-start: #e0f2fe; /* Lighter sky blue (old, might update) */
+            --gradient-end: #bfdbfe; /* Even lighter blue (old, might update) */
+        }
+
+        /* Base body styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            padding-bottom: 5rem; /* Space at the bottom for content */
+            transition: background-color 0.8s ease, color 0.8s ease; /* Smooth theme transition */
+
+            /* Subtle background noise texture */
+            background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Smooth Scrolling for the entire document */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar Design (for WebKit browsers like Chrome, Safari, Edge) */
+        ::-webkit-scrollbar {
+            width: 12px; /* Width of the vertical scrollbar */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color); /* Background of the scrollbar track */
+            border-radius: 10px; /* Rounded corners for the track */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color); /* Color of the scrollbar thumb (draggable part) */
+            border-radius: 10px; /* Rounded corners for the thumb */
+            border: 3px solid var(--bg-color); /* Creates a border/padding effect around the thumb */
+        }
+
+        /* Scrollbar thumb hover state */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #08a3bd; /* Darker accent on hover */
+        }
+
+        /* --- Input Screen Styles --- */
+        #input-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: opacity 0.6s ease-out;
+            z-index: 10;
+            background-color: var(--bg-color);
+            padding: 1rem; /* Added padding for very small screens */
+            box-sizing: border-box;
+        }
+
+        #input-screen h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Subtle text shadow */
+        }
+
+        #birthdate-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        #birthdate-input {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--card-bg); /* Use card background for input */
+            color: var(--text-color);
+            border: 1px solid var(--label-color);
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            font-size: 1.3rem;
+            text-align: center;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow); /* Apply card shadow to input */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.8s ease;
+            color-scheme: light; /* Force light scheme for date picker */
+            max-width: 90%; /* Ensure it doesn't overflow on small screens */
+        }
+        
+        #birthdate-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3); /* Accent color ring on focus */
+        }
+
+        #error-message {
+            color: #ef4444;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            font-weight: 600;
+        }
+
+        #go-button {
+            background-color: var(--accent-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, color 0.8s ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Lighter shadow for button */
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        #go-button:hover {
+            background-color: #08a3bd; /* Darker accent for hover */
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        #go-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Stats Container Styles --- */
+        #stats-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 3rem; /* Increased gap for more breathing room between stats */
+            padding: 5rem 1rem; /* Adjusted padding for mobile */
+            width: 100%;
+            max-width: 800px; /* Slightly narrower max-width for simpler look */
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.8s ease-out;
+            margin-top: 4rem;
+        }
+
+        .stat-item {
+            opacity: 0;
+            text-align: center;
+            animation: fadeInScale 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0; /* Removed padding for simpler look */
+            background-color: transparent; /* No background */
+            border-radius: 0; /* No border-radius */
+            box-shadow: none; /* No shadow */
+            transition: transform 0.3s ease, background-color 0.8s ease; /* Removed box-shadow from transition */
+            min-height: unset; /* Remove fixed height */
+            justify-content: flex-start; /* Align content to start */
+        }
+
+        .stat-item:hover {
+            transform: none; /* No transform on hover */
+            box-shadow: none; /* No shadow on hover */
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: clamp(0.9rem, 3.5vw, 1.5rem);
+            font-weight: 600;
+            color: var(--label-color);
+            margin-top: 0.5rem;
+            display: flex; /* Make label a flex container for emoji alignment */
+            align-items: center; /* Align items vertically */
+            gap: 0.5rem; /* Space between emoji and text */
+        }
+        
+        .stat-label .emoji {
+            font-size: 1.2em; /* Slightly larger emoji in label */
+            line-height: 1;
+        }
+
+        /* SVG Icon Styling for Stats */
+        .stat-icon-wrapper {
+            margin-bottom: 0.8rem;
+        }
+        .stat-icon-wrapper svg {
+            width: clamp(2.5rem, 6vw, 4.5rem);
+            height: clamp(2.5rem, 6vw, 4.5rem);
+            stroke: var(--accent-color); /* Icons use accent color */
+            fill: none;
+            stroke-width: 2;
+            transition: stroke 0.8s ease;
+        }
+
+        /* --- General Section Styling (What If & Comparison) --- */
+        .interactive-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5rem;
+            padding: 5rem 1rem; /* Adjusted padding for mobile */
+            width: 100%;
+            max-width: 800px; /* Consistent max-width */
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Added transform for animation */
+            margin-top: 5rem;
+            transform: translateY(50px) scale(0.98); /* Initial state for animation */
+        }
+        
+        /* Animation when section becomes visible */
+        .interactive-section.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .interactive-section h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 2.5rem;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.08); /* Subtle text shadow */
+        }
+
+        .interactive-scenario {
+            background-color: var(--card-bg); /* Card background for scenarios */
+            border-radius: 1.5rem; /* More rounded corners */
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 550px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow); /* Card shadow */
+            transition: background-color 0.8s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box; /* Include padding in width */
+            
+            /* Colorful Gradient Border - Adjusted to new accent color */
+            border: 2px solid transparent;
+            background-image: linear-gradient(var(--card-bg), var(--card-bg)), 
+                              linear-gradient(to right, #06b6d4, #38bdf8, #818cf8); /* Cyan, Light Blue, Light Purple */
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+        }
+        .interactive-scenario:hover {
+            transform: translateY(-5px); /* Lift on hover */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); /* Stronger shadow on hover */
+        }
+
+        .interactive-question {
+            font-size: clamp(1.1rem, 3.5vw, 1.3rem);
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .interactive-question input[type="number"] {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color); /* Use body background for input in card */
+            color: var(--text-color);
+            border: 1px solid var(--label-color);
+            border-radius: 0.5rem;
+            padding: 0.6rem 0.8rem;
+            font-size: 1.1rem;
+            text-align: center;
+            width: 80px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Inner shadow for depth */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.8s ease;
+            color-scheme: light; /* Force light scheme */
+        }
+        
+        .interactive-question input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 0 0 3px rgba(6, 182, 212, 0.3); /* Accent ring on focus */
+        }
+
+        .interactive-button {
+            background-color: var(--accent-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.9rem 1.8rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, color 0.8s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .interactive-button:hover {
+            background-color: #08a3bd;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .interactive-button:active {
+            transform: translateY(0); /* Return to original position on click */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Enhanced .interactive-result for clarity and mobile friendliness */
+        .interactive-result {
+            font-size: clamp(1.2rem, 4.5vw, 1.6rem); /* Slightly larger on mobile */
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+            display: flex; /* Use flex for emoji alignment */
+            align-items: flex-start; /* Align emoji to the top of text */
+            gap: 0.6rem;
+            line-height: 1.4;
+            text-align: left; /* Align text to the left within its container */
+            width: 100%; /* Take full width of parent */
+            padding: 0 0.5rem; /* Small horizontal padding */
+            box-sizing: border-box; /* Include padding in width */
+            margin-bottom: 0.5rem; /* Added margin for separation */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Emoji styling */
+        .interactive-result .emoji {
+            font-size: 1.8em; /* Slightly larger emoji */
+            line-height: 1;
+            flex-shrink: 0; /* Prevent emoji from shrinking */
+        }
+
+        /* SVG Icon Styling for Interactive Scenarios (as background) */
+        .scenario-icon-wrapper {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            opacity: 0.06;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .scenario-icon-wrapper svg {
+            width: clamp(3rem, 10vw, 6rem);
+            height: clamp(3rem, 10vw, 6rem);
+            stroke: var(--label-color); /* Use label color for background icons */
+            fill: none;
+            stroke-width: 1.5;
+            transition: stroke 0.8s ease;
+        }
+        
+        /* SVG Icon Styling for Comparison Results */
+        .comparison-icon-wrapper {
+            margin-right: 0.8rem;
+            flex-shrink: 0; /* Prevent icon from shrinking */
+        }
+        .comparison-icon-wrapper svg {
+            width: clamp(1.6rem, 5vw, 2.5rem);
+            height: clamp(1.6rem, 5vw, 2.5rem);
+            stroke: var(--accent-color);
+            fill: none;
+            stroke-width: 2;
+            vertical-align: middle;
+            transition: stroke 0.8s ease;
+        }
+
+        /* Media queries for smaller screens */
+        @media (max-width: 768px) {
+            #stats-container {
+                gap: 2rem;
+            }
+            .stat-value {
+                font-size: clamp(2rem, 7vw, 3.8rem);
+            }
+            .stat-label {
+                font-size: clamp(0.85rem, 3.2vw, 1.4rem);
+            }
+            .stat-icon-wrapper svg {
+                width: clamp(2rem, 5vw, 3.8rem);
+                height: clamp(2rem, 5vw, 3.8rem);
+            }
+
+            .interactive-section {
+                gap: 2rem;
+                padding: 4rem 1rem;
+            }
+            .interactive-scenario {
+                padding: 2rem 1.5rem; /* Adjusted padding */
+            }
+            .interactive-question {
+                font-size: clamp(1rem, 3vw, 1.2rem);
+            }
+            .interactive-question input[type="number"] {
+                width: 70px; /* Slightly smaller input on mobile */
+            }
+            .interactive-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+            .interactive-result {
+                font-size: clamp(1.1rem, 4vw, 1.4rem);
+            }
+            .interactive-result .emoji {
+                font-size: 1.5em;
+            }
+            .scenario-icon-wrapper svg {
+                width: clamp(2.5rem, 9vw, 5rem);
+                height: clamp(2.5rem, 9vw, 5rem);
+            }
+            .comparison-icon-wrapper svg {
+                width: clamp(1.3rem, 4vw, 2rem);
+                height: clamp(1.3rem, 4vw, 2rem);
+            }
+        }
+
+        @media (max-width: 480px) {
+            #input-screen h1 {
+                font-size: 2.2rem;
+            }
+            #birthdate-input {
+                padding: 0.8rem 1rem;
+                font-size: 1.1rem;
+            }
+            #go-button {
+                padding: 0.9rem 2rem;
+                font-size: 1.1rem;
+            }
+            .interactive-scenario {
+                padding: 1.5rem 1rem; /* Further adjusted padding for very small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="input-screen">
+        <h1>Uncover Your Life's Journey!</h1>
+        <label for="birthdate-input" id="birthdate-label">Your Birthdate:</label>
+        <input type="date" id="birthdate-input" value="2000-01-01">
+        <p id="error-message">Please select a valid date in the past.</p>
+        <button id="go-button">Let's Go!</button>
+    </div>
+
+    <div id="stats-container">
+    </div>
+
+    <div id="what-if-container" class="interactive-section">
+        <h2>What If...?</h2>
+
+        <div class="interactive-scenario">
+            <p class="interactive-question">What if you woke up <input type="number" id="early-wake-hours" value="1" min="0" max="5"> hour(s) earlier every day?</p>
+            <button class="interactive-button" data-scenario="early-wake">Calculate Impact</button>
+            <p class="interactive-result" id="early-wake-result"></p>
+        </div>
+
+        <div class="interactive-scenario">
+            <p class="interactive-question">What if you saved $ <input type="number" id="savings-amount" value="100" min="0"> every month for <input type="number" id="savings-years" value="5" min="1"> years?</p>
+            <button class="interactive-button" data-scenario="savings">Calculate Savings</button>
+            <p class="interactive-result" id="savings-result"></p>
+        </div>
+        
+        <div class="interactive-scenario">
+            <p class="interactive-question">What if you walked <input type="number" id="extra-walk-minutes" value="30" min="0" max="120"> minutes extra every day?</p>
+            <button class="interactive-button" data-scenario="extra-walk">Calculate Impact</button>
+            <p class="interactive-result" id="extra-walk-result"></p>
+        </div>
+
+    </div>
+
+    <div id="comparison-container" class="interactive-section">
+        <h2>How Do You Compare?</h2>
+
+        <div class="interactive-scenario">
+            <p class="interactive-question">Your life length compared to the global average:</p>
+            <p class="interactive-result" id="global-average-comparison"></p>
+        </div>
+
+        <div class="interactive-scenario">
+            <p class="interactive-question">Your heartbeats compared to a tiny powerhouse (hummingbird):</p>
+            <p class="interactive-result" id="hummingbird-comparison"></p>
+        </div>
+        
+        <div class="interactive-scenario">
+            <p class="interactive-question">Estimated total steps taken in your life:</p>
+            <p class="interactive-result" id="estimated-steps"></p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Time-based Theme Logic ---
+        function applyThemeBasedOnTime() {
+            // Force light mode by removing 'night-mode' class
+            document.body.classList.remove('night-mode'); 
+        }
+
+        // Apply theme on initial load and then check every hour (though it will always be light now)
+        document.addEventListener('DOMContentLoaded', applyThemeBasedOnTime);
+        setInterval(applyThemeBasedOnTime, 3600000); // Check every hour (3600000 ms)
+
+
+        // --- SVG Icon Definitions ---
+        const statIcons = {
+            'years old': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+            'months old': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+            'weeks old': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+            'days old': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+            'hours lived': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+            'minutes passed': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+            'seconds ticked away': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+            'blinks of an eye': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`,
+            'breaths taken': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-wind"><path d="M9.59 4.59A2 2 0 0 1 11 3h2v2c-.67.67-.93 1.25-1 2H6z"></path><path d="M12 2v20M17 5h-7.5a3.5 3.5 0 0 0-3.5 3.5v5A3.5 3.5 0 0 0 9.5 17H15"></path></svg>`,
+            'heartbeats': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+            'trips around the sun': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`,
+            'dreams dreamt (probably)': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`,
+            'memories made': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+            'laughs laughed': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-smile"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>`, /* New Icon */
+        };
+
+        const statEmojis = {
+            'years old': '🎂',
+            'months old': '🗓️',
+            'weeks old': '📅',
+            'days old': '☀️',
+            'hours lived': '⏳',
+            'minutes passed': '⏱️',
+            'seconds ticked away': '⚡',
+            'blinks of an eye': '👁️',
+            'breaths taken': '🌬️',
+            'heartbeats': '❤️',
+            'trips around the sun': '🌎',
+            'dreams dreamt (probably)': '😴',
+            'memories made': '🧠',
+            'laughs laughed': '😂', /* New Emoji */
+        };
+
+        const comparisonIcons = {
+            'global-average-comparison': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+            'hummingbird-comparison': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-feather"><path d="M20.24 12.24l-6.22-6.22C11.5 4.34 9.17 4.17 7.23 5.09c-1.92.93-3.23 2.74-3.23 4.88 0 2.14 1.31 3.95 3.23 4.88.93.45 2.05.69 3.27.69.45 0 .89-.04 1.33-.12l6.22 6.22c.98.98 2.56.98 3.54 0l1.76-1.76c.98-.98.98-2.56 0-3.54z"></path><path d="M22 2L16 8"></path><path d="M15 9l-3 3"></path></svg>`,
+            'estimated-steps': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`,
+        };
+
+        const scenarioIcons = {
+            'early-wake': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sunrise"><path d="M12 2v2M5 5l1.5 1.5M2 12h2M5 19l1.5-1.5M12 22v-2M19 19l-1.5-1.5M22 12h-2M19 5l-1.5 1.5"></path><circle cx="12" cy="12" r="7"></circle></svg>`,
+            'savings': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+            'extra-walk': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-walking"><path d="M13 18l-1.6-1.6A4.5 4.5 0 0 1 10 13c0-2.4 2-4.4 4.4-4.4S18.8 8.6 18.8 11s-2 4.4-4.4 4.4z"></path><path d="M16 21l-2-2m-2-2l-2-2m-2-2L6 9M8 6h.01"></path></svg>`
+        };
+
+        // Helper function to insert SVG into a parent element
+        function insertSvg(parentElement, svgString, className = '') {
+            const svgWrapper = document.createElement('div');
+            svgWrapper.className = `svg-icon-wrapper ${className}`;
+            svgWrapper.innerHTML = svgString;
+            // Prepend for stat/comparison icons, append for background scenario icons
+            if (className.includes('stat-icon-wrapper') || className.includes('comparison-icon-wrapper')) {
+                parentElement.prepend(svgWrapper);
+            } else {
+                parentElement.appendChild(svgWrapper);
+            }
+        }
+
+        // --- Life Stats Logic ---
+        const birthdateInput = document.getElementById('birthdate-input');
+        const inputScreen = document.getElementById('input-screen');
+        const statsContainer = document.getElementById('stats-container');
+        const errorMessage = document.getElementById('error-message');
+        const goButton = document.getElementById('go-button');
+
+        let userAgeInYears = 0;
+        let userHeartbeats = 0;
+        let selectedBirthdate = null; // Store the valid birthdate
+
+        // Event listener for birthdate input changes
+        birthdateInput.addEventListener('change', () => {
+            const birthdateString = birthdateInput.value;
+            if (!birthdateString) {
+                errorMessage.textContent = "Please select a date.";
+                errorMessage.style.opacity = '1';
+                goButton.style.display = 'none';
+                return;
+            }
+
+            const birthdate = new Date(birthdateString);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize to start of day
+            birthdate.setHours(0, 0, 0, 0); // Normalize to start of day
+
+            if (birthdate > today) {
+                errorMessage.textContent = "Please select a date in the past.";
+                errorMessage.style.opacity = '1';
+                goButton.style.display = 'none';
+                return;
+            }
+
+            errorMessage.style.opacity = '0'; // Hide error if valid
+            goButton.style.display = 'block'; // Show the button
+            selectedBirthdate = new Date(birthdateString); // Store valid date
+        });
+
+        // Event listener for "Let's Go!" button click
+        goButton.addEventListener('click', () => {
+            if (selectedBirthdate) {
+                inputScreen.style.opacity = '0'; // Fade out input screen
+                setTimeout(() => {
+                    inputScreen.style.display = 'none'; // Hide input screen after fade
+                    statsContainer.style.display = 'flex'; // Changed to flex for one-by-one display
+                    void statsContainer.offsetWidth; // Trigger reflow to apply display:flex before opacity transition
+                    statsContainer.style.opacity = '1'; // Fade in stats container
+
+                    calculateAndShowStats(selectedBirthdate); // Calculate and display stats
+                }, 600); // Wait for fade-out to complete
+            } else {
+                errorMessage.style.opacity = '1'; // Show error if button clicked without valid date
+            }
+        });
+
+        // Function to calculate and display all life statistics
+        function calculateAndShowStats(birthdate) {
+            const now = new Date();
+            const ageInMs = now.getTime() - birthdate.getTime();
+            const ageInSeconds = ageInMs / 1000;
+            const ageInMinutes = ageInSeconds / 60;
+            const ageInHours = ageInMinutes / 60;
+            const ageInDays = ageInHours / 24;
+            const ageInWeeks = ageInDays / 7;
+            
+            const yearsDiff = now.getFullYear() - birthdate.getFullYear();
+            const monthsDiff = now.getMonth() - birthdate.getMonth();
+            const dayDiff = now.getDate() - birthdate.getDate();
+
+            // Calculate age in months, adjusting for day of month
+            let ageInMonths = yearsDiff * 12 + monthsDiff;
+            if (dayDiff < 0) {
+                ageInMonths--;
+            }
+
+            const ageInYearsPrecise = (ageInMs / (1000 * 60 * 60 * 24 * 365.25));
+            userAgeInYears = ageInYearsPrecise; // Store for other sections
+
+            // Define all the statistics to display
+            const stats = [
+                { value: ageInYearsPrecise, label: 'years old' },
+                { value: ageInMonths, label: 'months old' },
+                { value: ageInWeeks, label: 'weeks old' },
+                { value: ageInDays, label: 'days old' },
+                { value: ageInHours, label: 'hours lived' },
+                { value: ageInMinutes, label: 'minutes passed' },
+                { value: ageInSeconds, label: 'seconds ticked away' },
+                { value: ageInMinutes * 20, label: 'blinks of an eye' }, // Approx 20 blinks/min
+                { value: ageInMinutes * 16, label: 'breaths taken' }, // Approx 12-20 breaths/min, avg 16
+                { value: ageInMinutes * 80, label: 'heartbeats' }, // Approx 60-100 bpm, avg 80
+                { value: ageInYearsPrecise, label: 'trips around the sun' },
+                { value: ageInDays / 3, label: 'dreams dreamt (probably)' }, // Approx one dream cycle every 3 days
+                { value: 'Countless', label: 'memories made', isText: true }, // Textual stat
+                { value: ageInYearsPrecise * 3000, label: 'laughs laughed' }, /* New Stat: Approx 3000 laughs/year for adults */
+            ];
+
+            // Find and store total heartbeats for comparison section
+            const heartbeatStat = stats.find(s => s.label === 'heartbeats');
+            if (heartbeatStat) {
+                userHeartbeats = Math.floor(heartbeatStat.value);
+            }
+            
+            statsContainer.innerHTML = ''; // Clear any previous stats
+            // Start displaying stats one by one
+            displayNextStat(stats, 0, () => {
+                // Callback function to execute after all stats are displayed
+                initializeIntersectionObserver(); // Setup observer after initial content is loaded
+            });
+        }
+
+        // Recursive function to display stats one by one without forcing scroll
+        function displayNextStat(stats, index, callback) {
+            if (index >= stats.length) {
+                if (callback) callback(); // All stats displayed, call the final callback
+                return;
+            }
+
+            const stat = stats[index];
+            
+            const statDiv = document.createElement('div');
+            statDiv.className = 'stat-item';
+            
+            if (statIcons[stat.label]) {
+                insertSvg(statDiv, statIcons[stat.label], 'stat-icon-wrapper');
+            }
+
+            const valueP = document.createElement('p');
+            valueP.className = 'stat-value';
+
+            const labelP = document.createElement('p');
+            labelP.className = 'stat-label';
+            
+            // Add emoji to the label
+            if (statEmojis[stat.label]) {
+                labelP.innerHTML = `<span class="emoji">${statEmojis[stat.label]}</span>${stat.label}`;
+            } else {
+                labelP.textContent = stat.label;
+            }
+
+            statDiv.appendChild(valueP);
+            statDiv.appendChild(labelP);
+            statsContainer.appendChild(statDiv);
+            
+            if (stat.isText) {
+                valueP.textContent = stat.value;
+            } else {
+                const valueToAnimate = typeof stat.value === 'number' ? Math.floor(stat.value) : 0;
+                animateValue(valueP, 0, valueToAnimate, 1500); // Animate numbers counting up
+            }
+
+            // Schedule the next stat display after a delay
+            setTimeout(() => {
+                displayNextStat(stats, index + 1, callback);
+            }, 2200); // Delay for animation and readability
+        }
+
+
+        // Function to animate numerical values
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easedProgress = 1 - Math.pow(1 - progress, 4); // Cubic ease-out for smoother animation
+                const currentValue = Math.floor(easedProgress * (end - start) + start);
+                element.textContent = currentValue.toLocaleString('en-US'); // Format with commas
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // --- Intersection Observer for Section Animations ---
+        function initializeIntersectionObserver() {
+            const sectionsToAnimate = document.querySelectorAll('.interactive-section');
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const section = entry.target;
+                        section.style.display = 'flex'; // Ensure it's visible for animation
+                        setTimeout(() => { // Small delay to ensure display:flex is applied
+                            section.classList.add('is-visible');
+                            // Add background icons only when section becomes visible for the first time
+                            section.querySelectorAll('.interactive-scenario').forEach(scenarioDiv => {
+                                const button = scenarioDiv.querySelector('.interactive-button');
+                                if (button && button.dataset && button.dataset.scenario) { 
+                                    const scenarioType = button.dataset.scenario;
+                                    // Prevent adding duplicates if re-observing (though once added, it's done)
+                                    if (!scenarioDiv.querySelector('.scenario-icon-wrapper')) { 
+                                        if (scenarioIcons[scenarioType]) {
+                                            insertSvg(scenarioDiv, scenarioIcons[scenarioType], 'scenario-icon-wrapper');
+                                        }
+                                    }
+                                }
+                            });
+                            observer.unobserve(section); // Stop observing once it's visible
+                        }, 50); // Small delay
+                    }
+                });
+            }, {
+                root: null, // viewport
+                rootMargin: '0px',
+                threshold: 0.1 // Trigger when 10% of the section is visible
+            });
+
+            sectionsToAnimate.forEach(section => {
+                observer.observe(section);
+            });
+
+            // For comparison section, also display its specific stats once it's visible
+            // This ensures data is ready even if user scrolls quickly
+            observer.observe(comparisonContainer);
+            
+            // Add a callback for the comparison container becoming visible to calculate its stats
+            const comparisonObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !entry.target.dataset.statsCalculated) {
+                        displayComparisonStats();
+                        entry.target.dataset.statsCalculated = 'true'; // Mark as calculated
+                        comparisonObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            comparisonObserver.observe(comparisonContainer);
+        }
+
+        // --- What If Scenarios Logic ---
+        const whatIfContainer = document.getElementById('what-if-container');
+        const earlyWakeButton = document.querySelector('.interactive-button[data-scenario="early-wake"]');
+        const earlyWakeHoursInput = document.getElementById('early-wake-hours');
+        const earlyWakeResult = document.getElementById('early-wake-result');
+        const savingsButton = document.querySelector('.interactive-button[data-scenario="savings"]');
+        const savingsAmountInput = document.getElementById('savings-amount');
+        const savingsYearsInput = document.getElementById('savings-years');
+        const savingsResult = document.getElementById('savings-result');
+        const extraWalkButton = document.querySelector('.interactive-button[data-scenario="extra-walk"]');
+        const extraWalkMinutesInput = document.getElementById('extra-walk-minutes');
+        const extraWalkResult = document.getElementById('extra-walk-result');
+
+        // Event listener for "Early Wake" calculation
+        earlyWakeButton.addEventListener('click', () => {
+            const extraHoursPerDay = parseFloat(earlyWakeHoursInput.value);
+            if (isNaN(extraHoursPerDay) || extraHoursPerDay < 0) {
+                earlyWakeResult.style.color = '#ef4444'; /* Red */
+                earlyWakeResult.textContent = "Please enter a valid positive number of hours.";
+                earlyWakeResult.style.opacity = '1';
+                return;
+            }
+
+            const daysInYear = 365.25; // Accounting for leap years
+            const extraHoursPerYear = extraHoursPerDay * daysInYear;
+            const extraMinutesPerYear = extraHoursPerYear * 60;
+            const avgReadingSpeedWordsPerHour = 15000; // Average reading speed
+            const avgBookWords = 80000; // Average words in a book
+            const extraBooks = (extraHoursPerYear * avgReadingSpeedWordsPerHour) / avgBookWords;
+            const extraDays = extraHoursPerYear / 24;
+
+
+            earlyWakeResult.style.opacity = '0'; // Fade out previous result
+            setTimeout(() => {
+                earlyWakeResult.style.color = 'var(--accent-color)'; // Reset color
+                earlyWakeResult.innerHTML = `<span class="emoji">⏰</span>That's an extra ${Math.floor(extraHoursPerYear).toLocaleString()} hours, or ${Math.floor(extraMinutesPerYear).toLocaleString()} minutes, or roughly ${extraDays.toFixed(1)} extra days per year! Imagine what you could achieve: read ${extraBooks.toFixed(1)} more books or learn a new skill!`;
+                earlyWakeResult.style.opacity = '1'; // Fade in new result
+            }, 300);
+        });
+
+        // Event listener for "Savings" calculation
+        savingsButton.addEventListener('click', () => {
+            const monthlySavings = parseFloat(savingsAmountInput.value);
+            const years = parseFloat(savingsYearsInput.value);
+            const totalMonths = years * 12;
+
+            if (isNaN(monthlySavings) || monthlySavings < 0 || isNaN(years) || years <= 0) {
+                savingsResult.style.color = '#ef4444'; /* Red */
+                savingsResult.textContent = "Please enter valid positive amounts for savings and years.";
+                savingsResult.style.opacity = '1';
+                return;
+            }
+
+            const totalSavings = monthlySavings * totalMonths;
+            let savingsMessage = `In ${years} years, you would have saved $${totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}! `;
+            let emoji = '💰'; // Default emoji
+
+            if (totalSavings >= 100000) {
+                savingsMessage += `That's enough for a significant down payment on a house, or a luxurious round-the-world trip!`;
+                emoji = '🏠✈️';
+            } else if (totalSavings >= 10000) {
+                savingsMessage += `That could be a brand new car, or an incredible adventure!`;
+                emoji = '🚗🗺️';
+            } else if (totalSavings >= 1000) {
+                savingsMessage += `That's a nice vacation, or a solid start to a bigger goal!`;
+                emoji = '🏝️🎯';
+            } else {
+                savingsMessage += `Every little bit helps build a brighter future!`;
+                emoji = '✨';
+            }
+
+
+            savingsResult.style.opacity = '0'; // Fade out previous result
+            setTimeout(() => {
+                savingsResult.style.color = 'var(--accent-color)'; // Reset color
+                savingsResult.innerHTML = `<span class="emoji">${emoji}</span>${savingsMessage}`;
+                savingsResult.style.opacity = '1'; // Fade in new result
+            }, 300);
+        });
+
+        // Event listener for "Extra Walk" calculation
+        extraWalkButton.addEventListener('click', () => {
+            const extraMinutesPerDay = parseFloat(extraWalkMinutesInput.value);
+            if (isNaN(extraMinutesPerDay) || extraMinutesPerDay < 0) {
+                extraWalkResult.style.color = '#ef4444'; /* Red */
+                extraWalkResult.textContent = "Please enter a valid positive number of minutes.";
+                extraWalkResult.style.opacity = '1';
+                return;
+            }
+
+            const daysInYear = 365.25;
+            const totalExtraMinutesPerYear = extraMinutesPerDay * daysInYear;
+            const totalExtraHoursPerYear = totalExtraMinutesPerYear / 60;
+            const avgWalkingSpeedKmPerHour = 5; // Average walking speed in km/h
+            const extraKmPerYear = totalExtraHoursPerYear * avgWalkingSpeedKmPerHour;
+            const distanceAcrossEnglandKm = 500; // Approximate distance across England
+            const englandTrips = extraKmPerYear / distanceAcrossEnglandKm;
+
+            extraWalkResult.style.opacity = '0'; // Fade out previous result
+            setTimeout(() => {
+                extraWalkResult.style.color = 'var(--accent-color)'; // Reset color
+                let walkMessage = `That's an extra ${Math.floor(totalExtraMinutesPerYear).toLocaleString()} minutes, or about ${totalExtraHoursPerYear.toFixed(1)} hours of walking per year! `;
+                let emoji = '🚶‍♀️';
+                if (extraKmPerYear > 0) {
+                    walkMessage += `That's an incredible ${extraKmPerYear.toFixed(0).toLocaleString()} km, enough to walk around England ${englandTrips.toFixed(2)} times! Keep moving!`;
+                    emoji = '🌍👟';
+                }
+                extraWalkResult.innerHTML = `<span class="emoji">${emoji}</span>${walkMessage}`;
+                extraWalkResult.style.opacity = '1'; // Fade in new result
+            }, 300);
+        });
+
+        // --- Comparison to Others Logic ---
+        const comparisonContainer = document.getElementById('comparison-container');
+        const globalAverageComparison = document.getElementById('global-average-comparison');
+        const hummingbirdComparison = document.getElementById('hummingbird-comparison');
+        const estimatedSteps = document.getElementById('estimated-steps');
+
+        // Function to display the comparison statistics
+        function displayComparisonStats() {
+            const globalAverageLifespan = 73; // Global average lifespan in years
+            let lifespanMessage = `You've lived for ${userAgeInYears.toFixed(1)} years. `;
+            let emoji = '';
+            if (userAgeInYears > globalAverageLifespan) {
+                lifespanMessage += `That's longer than the current global average lifespan of ${globalAverageLifespan} years! Every moment is a gift – keep living it to the fullest!`;
+                emoji = '✨';
+            } else {
+                lifespanMessage += `The current global average lifespan is ${globalAverageLifespan} years. Life is an incredible journey, make every moment count!`;
+                emoji = '⏳';
+            }
+            globalAverageComparison.innerHTML = ''; // Clear previous content
+            insertSvg(globalAverageComparison, comparisonIcons['global-average-comparison'], 'comparison-icon-wrapper');
+            globalAverageComparison.append(document.createRange().createContextualFragment(`<span class="emoji">${emoji}</span>${lifespanMessage}`));
+            globalAverageComparison.style.opacity = '1';
+
+            const hummingbirdHeartRateBPM = 1200; // Hummingbird heart rate
+            const hummingbirdTotalBeatsPerYear = hummingbirdHeartRateBPM * 60 * 24 * 365.25;
+            const hummingbirdYearsToMatchUser = userHeartbeats / hummingbirdTotalBeatsPerYear;
+            
+            hummingbirdComparison.innerHTML = ''; // Clear previous content
+            insertSvg(hummingbirdComparison, comparisonIcons['hummingbird-comparison'], 'comparison-icon-wrapper');
+            hummingbirdComparison.append(document.createRange().createContextualFragment(`<span class="emoji">💖</span>Your heart has beaten approximately ${userHeartbeats.toLocaleString()} times. Think of the energy! A hummingbird's heart beats that many times in just about ${hummingbirdYearsToMatchUser.toFixed(2)} years – a true tiny powerhouse!`));
+            hummingbirdComparison.style.opacity = '1';
+
+            const averageStepsPerDay = 5000; // Can be a user input later
+            const totalEstimatedSteps = averageStepsPerDay * (userAgeInYears * 365.25);
+            
+            const stepsPerEquatorTrip = 50727848; // Approximate steps to walk Earth's equator
+            const equatorTrips = totalEstimatedSteps / stepsPerEquatorTrip;
+
+            estimatedSteps.innerHTML = ''; // Clear previous content
+            insertSvg(estimatedSteps, comparisonIcons['estimated-steps'], 'comparison-icon-wrapper');
+            estimatedSteps.append(document.createRange().createContextualFragment(`<span class="emoji">🚶</span>You've taken an estimated ${totalEstimatedSteps.toLocaleString()} steps. That's enough to walk around the Earth's equator approximately ${equatorTrips.toFixed(2)} times! Imagine the journey!`));
+            estimatedSteps.style.opacity = '1';
+        }
+
+    </script>
+</body>
+</html>

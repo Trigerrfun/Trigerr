@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Snakes & Ladders Universe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+
+        .page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 1rem;
+            text-align: center;
+        }
+        .page.active {
+            display: flex;
+        }
+        
+        #game-screen {
+             justify-content: space-between;
+        }
+
+        .option-btn {
+            padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600;
+            transition: all 0.2s; background-color: #374151; color: #d1d5db;
+            cursor: pointer; border: 2px solid transparent;
+        }
+        .option-btn:hover { background-color: #4b5563; }
+        .option-btn.active {
+            background-color: #4f46e5; color: #fff; border-color: #818cf8;
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.6);
+        }
+
+        @media (min-width: 1024px) {
+            #game-screen {
+                flex-direction: row;
+                justify-content: center;
+                gap: 2rem;
+            }
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            width: 90vw;
+            height: 90vw;
+            max-width: 600px;
+            max-height: 600px;
+            position: relative;
+            border: 4px solid #4a4a6a;
+            border-radius: 1rem;
+            background-color: #16213e;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .cell {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            font-weight: bold;
+            font-size: 0.75rem;
+            padding: 2px;
+            border: 1px solid #2a2a4a;
+            color: #a0a0c0;
+        }
+        .cell:nth-child(odd) { background-color: #1f294a; }
+        .cell:nth-child(even) { background-color: #1a2441; }
+        .cell .number {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            font-size: clamp(8px, 2vw, 14px);
+        }
+
+        .player {
+            position: absolute;
+            width: 9%;
+            height: 9%;
+            transition: all 0.8s ease-in-out;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Initial off-board position */
+            left: -10%;
+            top: 105%;
+        }
+
+        .player.player2 {
+            /* Staggered animation for the second player */
+            transition-delay: 0.2s;
+        }
+
+        .player svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .player-indicator {
+            transition: all 0.3s ease;
+        }
+        .player-active {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--tw-shadow-color);
+        }
+
+        #dice {
+            width: 60px; height: 60px;
+            perspective: 1000px;
+        }
+        #dice-cube {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+            cursor: pointer;
+        }
+        .dice-face {
+            position: absolute;
+            width: 60px; height: 60px;
+            border: 2px solid #93c5fd; border-radius: 8px;
+            background: rgba(99, 102, 241, 0.8);
+            backdrop-filter: blur(5px);
+            font-size: 28px; font-weight: bold; color: white;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .front  { transform: rotateY(  0deg) translateZ(30px); }
+        .back   { transform: rotateY(180deg) translateZ(30px); }
+        .right  { transform: rotateY( 90deg) translateZ(30px); }
+        .left   { transform: rotateY(-90deg) translateZ(30px); }
+        .top    { transform: rotateX( 90deg) translateZ(30px); }
+        .bottom { transform: rotateX(-90deg) translateZ(30px); }
+        
+        .art-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-content { transition: transform 0.3s ease; }
+        
+        .utility-btn {
+            background: #4a4a6a; border-radius: 50%; width: 40px; height: 40px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .utility-btn:hover { background-color: #6a6a8a; }
+        .utility-btn svg { width: 20px; height: 20px; color: white; }
+        
+        .main-btn {
+            width: 100%; max-width: 320px;
+            background-color: #4f46e5;
+            color: white; font-weight: bold;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
+            transition: all 0.2s ease-in-out;
+        }
+        .main-btn:hover {
+            background-color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(79, 70, 229, 0.5);
+        }
+
+
+        @media (min-width: 1024px) {
+            .desktop-controls {
+                order: 2;
+                max-width: 320px;
+            }
+            .board-container {
+                order: 1;
+            }
+             #dice { width: 80px; height: 80px; }
+            .dice-face { width: 80px; height: 80px; font-size: 36px; }
+            .front  { transform: rotateY(  0deg) translateZ(40px); }
+            .back   { transform: rotateY(180deg) translateZ(40px); }
+            .right  { transform: rotateY( 90deg) translateZ(40px); }
+            .left   { transform: rotateY(-90deg) translateZ(40px); }
+            .top    { transform: rotateX( 90deg) translateZ(40px); }
+            .bottom { transform: rotateX(-90deg) translateZ(40px); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div id="settings-screen" class="page active">
+        <div class="flex flex-col items-center gap-8 w-full max-w-lg p-4">
+            <h1 class="font-poppins text-4xl sm:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-purple-400">Game Settings</h1>
+            <div class="start-options flex flex-col gap-6 w-full bg-gray-800/50 p-6 rounded-2xl">
+                <div>
+                    <h2 class="text-xl font-semibold mb-3 text-gray-200">Game Mode</h2>
+                    <div id="game-mode-options" class="flex flex-wrap justify-center gap-3">
+                        <button data-mode="pvp" class="option-btn active">Player vs Player</button>
+                        <button data-mode="pvc" class="option-btn">Player vs Computer</button>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold mb-3 text-gray-200">Win Condition</h2>
+                    <div id="win-condition-options" class="flex flex-wrap justify-center gap-3">
+                        <button data-win="exact" class="option-btn active">Exact Roll to Win</button>
+                        <button data-win="bounce" class="option-btn">Bounce Back</button>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold mb-3 text-gray-200">Special Rule</h2>
+                    <div id="special-rule-options" class="flex flex-wrap justify-center gap-3">
+                        <button data-rule="none" class="option-btn">None</button>
+                        <button data-rule="six_extra_turn" class="option-btn active">Roll 6 = Extra Turn</button>
+                    </div>
+                </div>
+            </div>
+            <button id="proceed-btn" class="main-btn">
+                Proceed
+            </button>
+        </div>
+    </div>
+
+    <div id="pre-game-screen" class="page">
+        <div class="flex flex-col items-center gap-8 w-full max-w-lg p-4">
+            <h1 class="font-poppins text-5xl sm:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-purple-400">Snakes & Ladders</h1>
+            <p class="text-lg text-gray-300">Are you ready to play?</p>
+            <button id="start-game-btn" class="main-btn">
+                Start Game
+            </button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="page">
+        <div class="desktop-controls w-full flex flex-col items-center space-y-4">
+            <h1 class="font-poppins text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500 hidden lg:block">Snakes & Ladders</h1>
+            
+            <div class="w-full flex justify-between items-center px-4 lg:px-0">
+                <button id="new-game-btn" class="bg-red-700 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg text-md transition-transform transform hover:scale-105">
+                    New Game
+                </button>
+                <div class="flex gap-2">
+                    <button id="sound-btn" class="utility-btn"></button>
+                    <button id="share-btn" class="utility-btn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6.002l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full flex justify-around items-center">
+                <div id="p1-indicator" class="player-indicator p-3 lg:p-4 rounded-lg bg-gray-800/50 border-2 border-gray-400">
+                    <p class="font-bold text-lg lg:text-xl">Player 1</p>
+                </div>
+                <div id="p2-indicator" class="player-indicator p-3 lg:p-4 rounded-lg bg-gray-800/50 border-2 border-gray-400">
+                    <p id="p2-name" class="font-bold text-lg lg:text-xl">Player 2</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="board-container relative">
+            <div id="board" class="board"></div>
+            <svg id="art-layer" class="art-layer"></svg>
+            <div id="player1" class="player player1"></div>
+            <div id="player2" class="player player2"></div>
+        </div>
+
+        <div class="desktop-controls w-full flex flex-col items-center space-y-3 p-2">
+            <div id="dice" class="my-2">
+                <div id="dice-cube">
+                    <div class="dice-face front">1</div><div class="dice-face back">6</div><div class="dice-face right">4</div>
+                    <div class="dice-face left">3</div><div class="dice-face top">2</div><div class="dice-face bottom">5</div>
+                </div>
+            </div>
+            <button id="roll-dice-btn" class="w-full max-w-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg text-xl shadow-lg transition-transform transform hover:scale-105 disabled:bg-gray-500 disabled:cursor-not-allowed">
+                Roll Dice
+            </button>
+            <p id="game-message" class="h-8 text-center text-md lg:text-lg font-semibold text-yellow-300"></p>
+        </div>
+    </div>
+    
+    <div id="winner-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 invisible opacity-0">
+        <div class="modal-content bg-gray-800 rounded-2xl p-8 max-w-sm text-center border border-gray-700 shadow-xl transform scale-95">
+            <h3 id="winner-message" class="font-poppins text-3xl font-bold mb-4 text-green-400"></h3>
+            <p class="text-gray-300 mb-6">Congratulations!</p>
+            <button id="play-again-btn" class="w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-3 px-6 rounded-lg text-lg">
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Elements ---
+        const pages = {
+            settings: document.getElementById('settings-screen'),
+            preGame: document.getElementById('pre-game-screen'),
+            game: document.getElementById('game-screen'),
+        };
+        const boardEl = document.getElementById('board');
+        const artLayer = document.getElementById('art-layer');
+        const player1El = document.getElementById('player1');
+        const player2El = document.getElementById('player2');
+        const p1Indicator = document.getElementById('p1-indicator');
+        const p2Indicator = document.getElementById('p2-indicator');
+        const p2NameEl = document.getElementById('p2-name');
+        const rollDiceBtn = document.getElementById('roll-dice-btn');
+        const newGameBtn = document.getElementById('new-game-btn');
+        const diceCube = document.getElementById('dice-cube');
+        const gameMessageEl = document.getElementById('game-message');
+        const winnerModal = document.getElementById('winner-modal');
+        const winnerMessageEl = document.getElementById('winner-message');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const proceedBtn = document.getElementById('proceed-btn');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const gameModeOptions = document.getElementById('game-mode-options');
+        const winConditionOptions = document.getElementById('win-condition-options');
+        const specialRuleOptions = document.getElementById('special-rule-options');
+        const soundBtn = document.getElementById('sound-btn');
+        const shareBtn = document.getElementById('share-btn');
+
+        // --- Game State & Settings ---
+        let players, currentPlayerIndex, gameover;
+        let gameMode = 'pvp';
+        let winCondition = 'exact';
+        let specialRule = 'six_extra_turn';
+        let isMuted = false;
+
+        const boardSize = 100;
+        const playerElements = [player1El, player2El];
+        const playerIndicators = [p1Indicator, p2Indicator];
+        const playerColors = ['#9333ea', '#16a34a'];
+        const snakesAndLadders = { 4: 14, 9: 31, 20: 38, 28: 84, 40: 59, 51: 67, 63: 81, 71: 91, 17: 7, 54: 34, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 99: 78 };
+        
+        // --- UI Navigation ---
+        function showPage(pageName) {
+            Object.values(pages).forEach(p => p.classList.remove('active'));
+            pages[pageName].classList.add('active');
+        }
+
+        // --- SVGs and Icons ---
+        const frogSvg = (bodyColor, spotColor) => `
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(0, 5)">
+                    <ellipse cx="50" cy="45" rx="38" ry="32" fill="${bodyColor}"/>
+                    <circle cx="30" cy="25" r="12" fill="${bodyColor}"/>
+                    <circle cx="70" cy="25" r="12" fill="${bodyColor}"/>
+                    <circle cx="28" cy="23" r="5" fill="white"/>
+                    <circle cx="68" cy="23" r="5" fill="white"/>
+                    <circle cx="28" cy="23" r="2.5" fill="black"/>
+                    <circle cx="68" cy="23" r="2.5" fill="black"/>
+                    <ellipse cx="50" cy="65" rx="25" ry="15" fill="${spotColor}"/>
+                    <circle cx="40" cy="50" r="4" fill="${spotColor}"/>
+                    <circle cx="60" cy="50" r="4" fill="${spotColor}"/>
+                </g>
+            </svg>`;
+        const soundOnIcon = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>`;
+        const soundOffIcon = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>`;
+        
+        // --- Sound Effects (Tone.js) ---
+        let soundsReady = false;
+        let moveSound, ladderSound, snakeSound, winSound, rollSound;
+
+        async function setupSounds() {
+            if (soundsReady) return;
+            try {
+                await Tone.start();
+                moveSound = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.2 } }).toDestination();
+                ladderSound = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
+                snakeSound = new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.01, decay: 0.5, sustain: 0, release: 0.2 } }).toDestination();
+                winSound = new Tone.PolySynth(Tone.Synth).toDestination();
+                rollSound = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0 } }).toDestination();
+                Tone.Destination.mute = isMuted;
+                soundsReady = true;
+            } catch (e) { console.error("Could not initialize Tone.js sounds.", e); }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            if (soundsReady) {
+                Tone.Destination.mute = isMuted;
+            }
+            soundBtn.innerHTML = isMuted ? soundOffIcon : soundOnIcon;
+        }
+
+        function resetPlayerPositions() {
+            playerElements.forEach(el => {
+                el.style.transition = 'none'; // Disable transition for reset
+                el.style.left = '-10%';
+                el.style.top = '105%';
+                // Force a reflow to apply the reset styles immediately
+                el.offsetHeight; 
+                // Re-enable transition
+                el.style.transition = 'all 0.8s ease-in-out';
+            });
+            // Re-apply delay for player 2
+            player2El.style.transitionDelay = '0.2s';
+        }
+
+        function initGame() {
+            gameover = false;
+            players = [{ id: 1, position: 1, isHuman: true }, { id: 2, position: 1, isHuman: gameMode === 'pvp' }];
+            currentPlayerIndex = 0;
+            p2NameEl.textContent = gameMode === 'pvp' ? 'Player 2' : 'Computer';
+            
+            player1El.innerHTML = frogSvg('#a855f7', '#d8b4fe');
+            player2El.innerHTML = frogSvg('#22c55e', '#86efac');
+            p1Indicator.style.borderColor = playerColors[0];
+            p2Indicator.style.borderColor = playerColors[1];
+
+            drawBoard();
+            
+            // The animation is triggered by this call
+            setTimeout(drawPlayers, 100); 
+
+            updateActivePlayerUI();
+            gameMessageEl.textContent = `Player 1's turn to roll`;
+            rollDiceBtn.disabled = false;
+            hideWinnerModal();
+            showPage('game');
+
+            if (!players[currentPlayerIndex].isHuman) {
+                setTimeout(executeTurn, 1000);
+            }
+        }
+
+        function drawBoard() {
+            boardEl.innerHTML = '';
+            let cells = Array.from({ length: boardSize }, (_, i) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.square = i + 1;
+                cell.innerHTML = `<span class="number">${i + 1}</span>`;
+                return cell;
+            });
+            const finalCells = [];
+            for (let row = 9; row >= 0; row--) {
+                let oneRow = cells.slice(row * 10, (row + 1) * 10);
+                if (row % 2 !== 0) oneRow.reverse();
+                finalCells.push(...oneRow);
+            }
+            finalCells.reverse().forEach(cell => boardEl.appendChild(cell));
+            setTimeout(drawArt, 100);
+        }
+
+        function getCellCenter(square) {
+            const cellEl = boardEl.querySelector(`[data-square='${square}']`);
+            if (!cellEl) return { x: 0, y: 0 };
+            return {
+                x: (cellEl.offsetLeft + cellEl.offsetWidth / 2),
+                y: (cellEl.offsetTop + cellEl.offsetHeight / 2)
+            };
+        }
+
+        function createSvgElement(tag, attributes) {
+            const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+            for (const key in attributes) {
+                el.setAttribute(key, attributes[key]);
+            }
+            return el;
+        }
+
+        function drawLadder(startPos, endPos) {
+            const ladderWidth = 4.5;
+            const dx = endPos.x - startPos.x;
+            const dy = endPos.y - startPos.y;
+            const angle = Math.atan2(dy, dx);
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const offsetX = ladderWidth * Math.sin(angle);
+            const offsetY = ladderWidth * -Math.cos(angle);
+            artLayer.appendChild(createSvgElement('line', {
+                x1: startPos.x - offsetX, y1: startPos.y - offsetY,
+                x2: endPos.x - offsetX, y2: endPos.y - offsetY,
+                stroke: '#A0522D', 'stroke-width': '3', 'stroke-linecap': 'round'
+            }));
+            artLayer.appendChild(createSvgElement('line', {
+                x1: startPos.x + offsetX, y1: startPos.y + offsetY,
+                x2: endPos.x + offsetX, y2: endPos.y + offsetY,
+                stroke: '#A0522D', 'stroke-width': '3', 'stroke-linecap': 'round'
+            }));
+            const numRungs = Math.floor(length / 12);
+            for (let i = 1; i <= numRungs; i++) {
+                const p = i / (numRungs + 1);
+                const rungX = startPos.x + p * dx;
+                const rungY = startPos.y + p * dy;
+                artLayer.appendChild(createSvgElement('line', {
+                    x1: rungX - offsetX, y1: rungY - offsetY,
+                    x2: rungX + offsetX, y2: rungY + offsetY,
+                    stroke: '#D2691E', 'stroke-width': '2.5', 'stroke-linecap': 'round'
+                }));
+            }
+        }
+        
+        function drawSnake(startPos, endPos) {
+            const dx = endPos.x - startPos.x;
+            const dy = endPos.y - startPos.y;
+            const midX = startPos.x + dx * 0.5 + dy * 0.3; 
+            const midY = startPos.y + dy * 0.5 - dx * 0.3;
+            artLayer.appendChild(createSvgElement('path', {
+                d: `M ${startPos.x} ${startPos.y} Q ${midX} ${midY} ${endPos.x} ${endPos.y}`,
+                stroke: '#2ECC71', 'stroke-width': '6', fill: 'none', 'stroke-linecap': 'round',
+                'stroke-dasharray': '0.1 8', 'stroke-dashoffset': '0'
+            }));
+            const headAngle = Math.atan2(midY - startPos.y, midX - startPos.x);
+            artLayer.appendChild(createSvgElement('circle', {
+                cx: startPos.x, cy: startPos.y, r: '6', fill: '#27AE60'
+            }));
+            
+            const eyeOffsetX = 3 * Math.cos(headAngle + Math.PI/2);
+            const eyeOffsetY = 3 * Math.sin(headAngle + Math.PI/2);
+            const pupilOffsetX = 2 * Math.cos(headAngle);
+            const pupilOffsetY = 2 * Math.sin(headAngle);
+
+            artLayer.appendChild(createSvgElement('circle', { cx: startPos.x + eyeOffsetX + pupilOffsetX, cy: startPos.y + eyeOffsetY + pupilOffsetY, r: '1.8', fill: 'white' }));
+            artLayer.appendChild(createSvgElement('circle', { cx: startPos.x - eyeOffsetX + pupilOffsetX, cy: startPos.y - eyeOffsetY + pupilOffsetY, r: '1.8', fill: 'white' }));
+            artLayer.appendChild(createSvgElement('circle', { cx: startPos.x + eyeOffsetX + pupilOffsetX, cy: startPos.y + eyeOffsetY + pupilOffsetY, r: '0.9', fill: 'black' }));
+            artLayer.appendChild(createSvgElement('circle', { cx: startPos.x - eyeOffsetX + pupilOffsetX, cy: startPos.y - eyeOffsetY + pupilOffsetY, r: '0.9', fill: 'black' }));
+        }
+
+        function drawArt() {
+            artLayer.innerHTML = '';
+            const boardRect = boardEl.getBoundingClientRect();
+            if (boardRect.width === 0) return;
+            artLayer.setAttribute('viewBox', `0 0 ${boardRect.width} ${boardRect.height}`);
+            Object.entries(snakesAndLadders).forEach(([start, end]) => {
+                const startPos = getCellCenter(start);
+                const endPos = getCellCenter(end);
+                if (end > start) {
+                    drawLadder(startPos, endPos);
+                } else {
+                    drawSnake(startPos, endPos);
+                }
+            });
+        }
+        
+        function drawPlayers() {
+            players.forEach((player, index) => {
+                const pos = getCellCenter(player.position);
+                const el = playerElements[index];
+                // The transition in the CSS will animate the change to these new values
+                el.style.left = `${(pos.x / boardEl.offsetWidth) * 100}%`;
+                el.style.top = `${(pos.y / boardEl.offsetHeight) * 100}%`;
+                const offset = index === 0 ? '-45%, -55%' : '-55%, -45%';
+                el.style.transform = `translate(${offset})`;
+            });
+        }
+
+        function updateActivePlayerUI() {
+            playerIndicators.forEach((ind, index) => {
+                const isActive = index === currentPlayerIndex;
+                ind.classList.toggle('player-active', isActive);
+                ind.style.setProperty('--tw-shadow-color', isActive ? playerColors[index] : 'transparent');
+            });
+        }
+
+        function switchPlayer() {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            updateActivePlayerUI();
+            const currentPlayer = players[currentPlayerIndex];
+            const playerName = currentPlayer.isHuman ? `Player ${currentPlayer.id}` : 'Computer';
+            gameMessageEl.textContent = `${playerName}'s turn to roll`;
+            rollDiceBtn.disabled = !currentPlayer.isHuman;
+
+            if (!currentPlayer.isHuman && !gameover) {
+                setTimeout(executeTurn, 1500);
+            }
+        }
+
+        function animateDice(roll) {
+            const rotations = { 1: 'rotateY(0deg)', 2: 'rotateX(-90deg)', 3: 'rotateY(90deg)', 4: 'rotateY(-90deg)', 5: 'rotateX(90deg)', 6: 'rotateY(180deg)' };
+            diceCube.style.transform = `${rotations[roll]} rotateX(720deg) rotateY(720deg)`;
+        }
+
+        async function executeTurn() {
+            if (gameover) return;
+            await setupSounds();
+            rollDiceBtn.disabled = true;
+            let keepTurn;
+            do {
+                const roll = Math.floor(Math.random() * 6) + 1;
+                const currentPlayer = players[currentPlayerIndex];
+                const playerName = currentPlayer.isHuman ? `Player ${currentPlayer.id}` : 'Computer';
+                gameMessageEl.textContent = `${playerName} is rolling...`;
+                if (soundsReady) rollSound.triggerAttack();
+                animateDice(roll);
+                await new Promise(res => setTimeout(res, 1000));
+                gameMessageEl.textContent = `${playerName} rolled a ${roll}`;
+                await movePlayer(roll);
+                if (gameover) return;
+                keepTurn = (specialRule === 'six_extra_turn' && roll === 6);
+                if (keepTurn) {
+                    gameMessageEl.textContent = 'Rolled a 6! Go again.';
+                    await new Promise(res => setTimeout(res, 1500));
+                }
+            } while (keepTurn && !gameover);
+            if (!gameover) switchPlayer();
+        }
+
+        async function movePlayer(steps) {
+            const player = players[currentPlayerIndex];
+            let newPos = player.position + steps;
+
+            if (newPos > boardSize) {
+                if (winCondition === 'bounce') {
+                    newPos = boardSize - (newPos - boardSize);
+                } else {
+                    gameMessageEl.textContent = 'You need an exact roll to win!';
+                    await new Promise(res => setTimeout(res, 1500));
+                    return;
+                }
+            }
+            player.position = newPos;
+            drawPlayers();
+            if (soundsReady) moveSound.triggerAttackRelease('C4', '8n');
+            await new Promise(res => setTimeout(res, 600));
+
+            if (snakesAndLadders[player.position]) {
+                const endPos = snakesAndLadders[player.position];
+                const isLadder = endPos > player.position;
+                gameMessageEl.textContent = `Whoa! A ${isLadder ? 'ladder' : 'snake'}!`;
+                if (soundsReady) isLadder ? ladderSound.triggerAttackRelease('G5', '8n') : snakeSound.triggerAttackRelease('C3', '4n');
+                player.position = endPos;
+                await new Promise(res => setTimeout(res, 500));
+                drawPlayers();
+                await new Promise(res => setTimeout(res, 600));
+            }
+
+            if (player.position === boardSize) {
+                gameover = true;
+                rollDiceBtn.disabled = true;
+                const winnerName = player.isHuman ? `Player ${player.id}` : 'Computer';
+                gameMessageEl.textContent = `${winnerName} wins!`;
+                if (soundsReady) winSound.triggerAttackRelease(['C4', 'E4', 'G4', 'C5'], '2n');
+                showWinnerModal(winnerName);
+            }
+        }
+
+        function showWinnerModal(winnerName) {
+            const modalContent = winnerModal.querySelector('.modal-content');
+            winnerMessageEl.textContent = `${winnerName} Wins!`;
+            winnerModal.classList.remove('hidden', 'invisible', 'opacity-0');
+            setTimeout(() => modalContent.classList.remove('scale-95'), 10);
+        }
+
+        function hideWinnerModal() {
+            const modalContent = winnerModal.querySelector('.modal-content');
+            modalContent.classList.add('scale-95');
+            winnerModal.classList.add('opacity-0');
+            setTimeout(() => winnerModal.classList.add('hidden', 'invisible'), 300);
+        }
+
+        function setActiveOption(container, selectedValue, dataAttribute) {
+            Array.from(container.children).forEach(button => {
+                button.classList.toggle('active', button.dataset[dataAttribute] === selectedValue);
+            });
+        }
+        
+        // --- Event Listeners ---
+        proceedBtn.addEventListener('click', () => showPage('preGame'));
+        startGameBtn.addEventListener('click', initGame);
+        
+        rollDiceBtn.addEventListener('click', executeTurn);
+        diceCube.addEventListener('click', () => !rollDiceBtn.disabled && executeTurn());
+        
+        playAgainBtn.addEventListener('click', () => {
+            hideWinnerModal();
+            resetPlayerPositions();
+            setTimeout(initGame, 100);
+        });
+
+        newGameBtn.addEventListener('click', () => {
+            resetPlayerPositions();
+            showPage('settings');
+        });
+
+        gameModeOptions.addEventListener('click', (e) => {
+            if (e.target.closest('button')?.dataset.mode) {
+                gameMode = e.target.closest('button').dataset.mode;
+                setActiveOption(gameModeOptions, gameMode, 'mode');
+            }
+        });
+        winConditionOptions.addEventListener('click', (e) => {
+            if (e.target.closest('button')?.dataset.win) {
+                winCondition = e.target.closest('button').dataset.win;
+                setActiveOption(winConditionOptions, winCondition, 'win');
+            }
+        });
+        specialRuleOptions.addEventListener('click', (e) => {
+            if (e.target.closest('button')?.dataset.rule) {
+                specialRule = e.target.closest('button').dataset.rule;
+                setActiveOption(specialRuleOptions, specialRule, 'rule');
+            }
+        });
+
+        soundBtn.addEventListener('click', toggleMute);
+
+        shareBtn.addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Snakes & Ladders Universe',
+                    text: 'Come and play this awesome Snakes & Ladders game!',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Game URL copied to clipboard!');
+            }
+        });
+        
+        window.addEventListener('resize', drawArt);
+
+        // --- Initial Setup ---
+        soundBtn.innerHTML = isMuted ? soundOffIcon : soundOnIcon;
+        showPage('settings');
+    });
+    </script>
+
+</body>
+</html>
